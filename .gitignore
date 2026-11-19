@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+.venv/
+build/
+dist/
+*.spec.bak
+.pytest_cache/
+tv-app/.gradle/
+tv-app/build/
+tv-app/app/build/
+tv-app/local.properties

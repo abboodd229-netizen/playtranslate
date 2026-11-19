@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PlayTranslate</title>
+<style>
+  :root { --size: 44px; --fg: #fff; --speaker: #ffd54f; --bg: rgba(0,0,0,.55); --bottom: 17vh; --maxw: 80vw; }
+  html, body { margin: 0; height: 100%; background: #111; color: #ddd; overflow: hidden;
+    font-family: "Noto Naskh Arabic", "Segoe UI", Tahoma, "Arial", sans-serif; }
+  body.transparent { background: transparent; }
+  #status { position: fixed; top: 12px; right: 16px; font-size: 14px; opacity: .7; }
+  #status.ok { color: #8bc34a; } #status.bad { color: #ff7043; }
+  #box { position: fixed; left: 50%; bottom: var(--bottom); transform: translateX(-50%);
+    max-width: var(--maxw); padding: .25em .6em; border-radius: .25em; background: var(--bg);
+    font-size: var(--size); line-height: 1.5; text-align: center; color: var(--fg);
+    transition: opacity .12s; opacity: 0; white-space: pre-wrap; unicode-bidi: plaintext; }
+  #box.show { opacity: 1; }
+  #box.outline { text-shadow: 0 0 3px #000, 0 0 3px #000, 0 2px 4px #000; }
+  .speaker { color: var(--speaker); font-weight: 700; }
+  #hint { position: fixed; top: 40%; width: 100%; text-align: center; font-size: 18px; opacity: .5; }
+</style>
+</head>
+<body>
+<div id="status">جارٍ الاتصال…</div>
+<div id="hint">هذه الصفحة تعرض الترجمة القادمة من أداة اللابتوب.<br>اتركها مفتوحة وابدأ اللعب.</div>
+<div id="box" class="outline"></div>
+<script>
+(function () {
+  "use strict";
+  var box = document.getElementById("box");
+  var status = document.getElementById("status");
+  var hint = document.getElementById("hint");
+  var style = {};
+  var retry = 500;
+  if (location.search.indexOf("transparent") >= 0) document.body.classList.add("transparent");
+
+  function hexToRgba(hex, alpha) {
+    var h = (hex || "#000000").replace("#", "");
+    var r = parseInt(h.substr(0, 2), 16) || 0, g = parseInt(h.substr(2, 2), 16) || 0, b = parseInt(h.substr(4, 2), 16) || 0;
+    return "rgba(" + r + "," + g + "," + b + "," + alpha + ")";
+  }
+
+  function applyStyle() {
+    var root = document.documentElement.style;
+    var scale = window.innerHeight / 1080;
+    root.setProperty("--size", Math.round((style.font_size || 44) * scale) + "px");
+    root.setProperty("--fg", style.text_color || "#fff");
+    root.setProperty("--speaker", style.speaker_color || "#ffd54f");
+    var op = style.background_opacity == null ? 0.55 : style.background_opacity;
+    root.setProperty("--bg", hexToRgba(style.background_color, op));
+    root.setProperty("--bottom", ((style.bottom_margin == null ? 0.17 : style.bottom_margin) * 100) + "vh");
+    root.setProperty("--maxw", ((style.max_width || 0.8) * 100) + "vw");
+    if (style.font_family) box.style.fontFamily = '"' + style.font_family + '", "Segoe UI", Tahoma, sans-serif';
+    box.classList.toggle("outline", style.outline !== false);
+  }
+
+  function show(lines) {
+    box.textContent = "";
+    lines.forEach(function (line, i) {
+      if (i > 0) box.appendChild(document.createElement("br"));
+      if (line.speaker) {
+        var s = document.createElement("span");
+        s.className = "speaker";
+        s.textContent = line.speaker + ": ";
+        box.appendChild(s);
+      }
+      box.appendChild(document.createTextNode(line.text || ""));
+    });
+    box.classList.add("show");
+    hint.style.display = "none";
+  }
+
+  function connect() {
+    var ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
+    ws.onopen = function () {
+      retry = 500;
+      status.textContent = "متصل";
+      status.className = "ok";
+      ws.send(JSON.stringify({ type: "hello", client: "browser", name: navigator.userAgent.slice(0, 60), protocol: 1 }));
+    };
+    ws.onmessage = function (ev) {
+      var msg;
+      try { msg = JSON.parse(ev.data); } catch (e) { return; }
+      if (msg.type === "hello" || msg.type === "style") { style = msg.style || {}; applyStyle(); }
+      else if (msg.type === "show") show(msg.lines || []);
+      else if (msg.type === "hide") box.classList.remove("show");
+      else if (msg.type === "ping") ws.send(JSON.stringify({ type: "pong", t: msg.t }));
+    };
+    ws.onclose = function () {
+      status.textContent = "غير متصل، إعادة المحاولة…";
+      status.className = "bad";
+      box.classList.remove("show");
+      setTimeout(connect, retry);
+      retry = Math.min(retry * 2, 5000);
+    };
+    ws.onerror = function () { ws.close(); };
+  }
+
+  window.addEventListener("resize", applyStyle);
+  applyStyle();
+  connect();
+})();
+</script>
+</body>
+</html>

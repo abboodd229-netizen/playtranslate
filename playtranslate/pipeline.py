@@ -1,0 +1,258 @@
+"""The capture -> detect -> OCR -> translate -> display loop.
+
+Runs in one worker thread at `capture_fps`. OCR happens in that thread
+(tens of milliseconds on the subtitle crop). Translation runs in a second
+thread so a slow network never stalls detection: if the subtitle changes or
+disappears while a translation is in flight, the late result is cached but
+not shown.
+"""
+
+from __future__ import annotations
+
+import logging
+import threading
+import time
+from concurrent.futures import Future, ThreadPoolExecutor
+from dataclasses import dataclass, field
+from typing import Callable, Protocol
+
+import numpy as np
+
+from .capture import CaptureError, Frame, FrameSource
+from .detect import DetectorSettings, Gone, Stable, SubtitleDetector
+from .ocr import OcrEngine, OcrUnavailable, create_engine
+from .textproc import Segment, joined, similar, to_segments
+from .translate import TranslationResult, TranslationService
+
+log = logging.getLogger(__name__)
+
+
+class Sink(Protocol):
+    def show(self, lines: list[dict]) -> object: ...
+    def hide(self) -> None: ...
+
+
+@dataclass
+class SubtitleEvent:
+    english: str
+    arabic: str
+    segments: list[dict]
+    origin: str
+    ocr_ms: float
+    translate_ms: float
+    total_ms: float
+    error: str = ""
+    crop: np.ndarray | None = field(default=None, repr=False)
+
+
+@dataclass
+class PipelineSettings:
+    fps: int = 10
+    linger_ms: int = 700
+    split_speaker: bool = True
+    detector: DetectorSettings = field(default_factory=DetectorSettings)
+
+
+class Pipeline:
+    def __init__(self, source_factory: Callable[[], FrameSource], translator: TranslationService,
+                 sinks: list[Sink], settings: PipelineSettings, ocr_name: str = "auto",
+                 ocr_engine: OcrEngine | None = None):
+        self._source_factory = source_factory
+        self.translator = translator
+        self.sinks = list(sinks)
+        self.settings = settings
+        self._ocr_name = ocr_name
+        self._ocr: OcrEngine | None = ocr_engine
+        self._detector = SubtitleDetector(settings.detector)
+        self._thread: threading.Thread | None = None
+        self._stop = threading.Event()
+        self._settings_lock = threading.Lock()
+        self._pending_settings: PipelineSettings | None = None
+        self._executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="translate")
+        self._generation = 0
+        # Guards generation/showing state shared by the worker and translate threads.
+        self._display_lock = threading.RLock()
+        self._shown_english = ""
+        self._showing = False
+        self._hide_at: float | None = None
+        self._last_geometry: tuple | None = None
+        self.source: FrameSource | None = None
+
+        # Callbacks (called from worker threads; GUI must marshal to its thread).
+        self.on_status: Callable[[str, str], None] = lambda text, level: None
+        self.on_subtitle: Callable[[SubtitleEvent], None] = lambda ev: None
+        self.on_hide: Callable[[], None] = lambda: None
+        self.on_geometry: Callable[[Frame], None] = lambda frame: None
+        self.on_stopped: Callable[[str], None] = lambda reason: None
+
+    # ---- control -----------------------------------------------------
+
+    def start(self) -> None:
+        if self.running:
+            return
+        self._stop.clear()
+        self._thread = threading.Thread(target=self._run, name="pipeline", daemon=True)
+        self._thread.start()
+
+    def stop(self, wait: bool = True) -> None:
+        self._stop.set()
+        if wait and self._thread and self._thread is not threading.current_thread():
+            self._thread.join(timeout=5)
+
+    def shutdown(self) -> None:
+        self.stop()
+        self._executor.shutdown(wait=False, cancel_futures=True)
+
+    @property
+    def running(self) -> bool:
+        return bool(self._thread and self._thread.is_alive())
+
+    def update_settings(self, settings: PipelineSettings) -> None:
+        """Applied by the worker at the start of its next frame."""
+        with self._settings_lock:
+            self._pending_settings = settings
+
+    # ---- worker ------------------------------------------------------
+
+    def _apply_pending(self) -> None:
+        with self._settings_lock:
+            pending, self._pending_settings = self._pending_settings, None
+        if pending is not None:
+            self.settings = pending
+            self._detector = SubtitleDetector(pending.detector)
+
+    def _run(self) -> None:
+        reason = ""
+        try:
+            if self._ocr is None:
+                self.on_status("جارٍ تحميل محرك القراءة…", "info")
+                try:
+                    self._ocr = create_engine(self._ocr_name)
+                except OcrUnavailable as exc:
+                    reason = f"لا يوجد محرك قراءة متاح: {exc}"
+                    self.on_status(reason, "error")
+                    return
+                self._ocr.warm_up()
+            self.source = self._source_factory()
+            self.on_status(f"يعمل ({self._ocr.name})", "ok")
+            self._loop()
+        except EOFError:
+            reason = "انتهى التسجيل"
+        except Exception as exc:  # last line of defence: report, don't vanish
+            log.exception("Pipeline crashed")
+            reason = f"خطأ غير متوقع: {exc}"
+            self.on_status(reason, "error")
+        finally:
+            self._do_hide()
+            if self.source is not None:
+                try:
+                    self.source.close()
+                except Exception:
+                    pass
+            self.on_stopped(reason)
+
+    def _loop(self) -> None:
+        capture_problem = ""
+        while not self._stop.is_set():
+            self._apply_pending()
+            interval = 1.0 / max(1, self.settings.fps)
+            t0 = time.perf_counter()
+            try:
+                frame = self.source.grab()
+            except CaptureError as exc:
+                if str(exc) != capture_problem:
+                    capture_problem = str(exc)
+                    self.on_status(capture_problem, "warn")
+                self._do_hide()
+                self._stop.wait(0.5)
+                continue
+            if capture_problem:
+                capture_problem = ""
+                self.on_status(f"يعمل ({self._ocr.name})", "ok")
+
+            geometry = (frame.pic_left, frame.pic_top, frame.pic_width, frame.pic_height, frame.crop_left, frame.crop_top)
+            if geometry != self._last_geometry:
+                self._last_geometry = geometry
+                self.on_geometry(frame)
+
+            event = self._detector.feed(frame.crop)
+            if isinstance(event, Stable):
+                self._handle_stable(event, frame.timestamp)
+            elif isinstance(event, Gone):
+                with self._display_lock:
+                    self._generation += 1  # drop translations still in flight
+                    if self._showing:
+                        self._hide_at = time.monotonic() + self.settings.linger_ms / 1000.0
+            hide_at = self._hide_at
+            if hide_at is not None and time.monotonic() >= hide_at:
+                self._do_hide()
+
+            elapsed = time.perf_counter() - t0
+            self._stop.wait(max(0.0, interval - elapsed))
+
+    def _handle_stable(self, event: Stable, frame_ts: float) -> None:
+        t_ocr = time.perf_counter()
+        try:
+            lines = self._ocr.recognize(event.image, event.rows)
+        except Exception as exc:
+            log.exception("OCR failed")
+            self.on_status(f"تعذّرت القراءة: {exc}", "warn")
+            return
+        ocr_ms = (time.perf_counter() - t_ocr) * 1000
+        segments = to_segments(lines, self.settings.split_speaker)
+        if not segments:
+            return
+        english = joined(segments)
+        with self._display_lock:
+            if self._showing and similar(english, self._shown_english):
+                # Same line re-read (lighting change, OCR jitter): keep what is on screen.
+                self._hide_at = None
+                return
+            self._generation += 1
+            generation = self._generation
+            self._hide_at = None
+        future: Future = self._executor.submit(self.translator.translate, segments)
+        future.add_done_callback(
+            lambda f: self._on_translated(f, generation, english, segments, ocr_ms, frame_ts, event.image)
+        )
+
+    def _on_translated(self, future: Future, generation: int, english: str, segments: list[Segment],
+                       ocr_ms: float, frame_ts: float, crop: np.ndarray) -> None:
+        try:
+            result: TranslationResult = future.result()
+        except Exception as exc:
+            log.exception("Translation crashed")
+            self.on_status(f"تعذّرت الترجمة: {exc}", "warn")
+            return
+        lines = [{"speaker": s.speaker_target, "text": s.target} for s in result.segments]
+        with self._display_lock:
+            if generation != self._generation or self._stop.is_set():
+                return  # the subtitle changed or vanished meanwhile
+            for sink in self.sinks:
+                try:
+                    sink.show(lines)
+                except Exception:
+                    log.exception("Sink %r failed", sink)
+            self._showing = True
+            self._shown_english = english
+        total_ms = (time.monotonic() - frame_ts) * 1000
+        if result.error:
+            self.on_status(result.error, "warn")
+        self.on_subtitle(SubtitleEvent(
+            english=english, arabic=result.text, segments=lines, origin=result.origin,
+            ocr_ms=ocr_ms, translate_ms=result.ms, total_ms=total_ms, error=result.error, crop=crop,
+        ))
+
+    def _do_hide(self) -> None:
+        with self._display_lock:
+            self._hide_at = None
+            if not self._showing:
+                return
+            self._showing = False
+            self._shown_english = ""
+            for sink in self.sinks:
+                try:
+                    sink.hide()
+                except Exception:
+                    log.exception("Sink %r failed", sink)
+        self.on_hide()
