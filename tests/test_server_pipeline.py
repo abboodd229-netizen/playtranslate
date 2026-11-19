@@ -1,6 +1,7 @@
 import asyncio
 import json
 import socket
+import sys
 import threading
 import time
 
@@ -58,6 +59,7 @@ def test_server_websocket_and_overlay_page():
         srv.stop()
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="CI runners may not loop back broadcasts")
 def test_beacon_is_broadcast():
     port, dport = free_port(), free_port()
     rx = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

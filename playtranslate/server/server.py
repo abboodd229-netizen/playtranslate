@@ -26,9 +26,11 @@ import asyncio
 import json
 import logging
 import socket
+import sys
 import threading
 import time
 from importlib import resources
+from pathlib import Path
 from typing import Callable
 
 from aiohttp import WSMsgType, web
@@ -59,6 +61,17 @@ def local_ips() -> list[str]:
         pass
     good = [ip for ip in ips if not ip.startswith(("127.", "169.254."))]
     return good or ["127.0.0.1"]
+
+
+def apk_path() -> Path | None:
+    """The TV app bundled with this build, if any."""
+    candidates = [Path(__file__).resolve().parent / "static" / "PlayTranslateTV.apk"]
+    if getattr(sys, "frozen", False):
+        candidates.append(Path(sys.executable).resolve().parent / "PlayTranslateTV.apk")
+    for c in candidates:
+        if c.is_file():
+            return c
+    return None
 
 
 class DisplayServer:
@@ -119,9 +132,11 @@ class DisplayServer:
         app.router.add_get("/overlay", self._overlay)
         app.router.add_get("/ws", self._ws)
         app.router.add_get("/api/state", self._api_state)
+        app.router.add_get("/tv.apk", self._apk)
         self._runner = web.AppRunner(app, access_log=None)
         await self._runner.setup()
-        site = web.TCPSite(self._runner, host="0.0.0.0", port=self.port, reuse_address=True)
+        # reuse_address is left at the platform default (on Windows it would let two apps share the port).
+        site = web.TCPSite(self._runner, host="0.0.0.0", port=self.port)
         try:
             await site.start()
         except OSError as exc:
@@ -148,6 +163,16 @@ class DisplayServer:
     async def _overlay(self, request: web.Request) -> web.Response:
         html = resources.files(__package__).joinpath("static/overlay.html").read_text(encoding="utf-8")
         return web.Response(text=html, content_type="text/html", charset="utf-8")
+
+    async def _apk(self, request: web.Request) -> web.StreamResponse:
+        """Lets the TV download its app from the laptop (Downloader app -> http://<laptop>:8765/tv.apk)."""
+        path = apk_path()
+        if path is None:
+            return web.Response(status=404, text="ملف تطبيق التلفزيون غير موجود في هذه النسخة.", charset="utf-8")
+        return web.FileResponse(path, headers={
+            "Content-Type": "application/vnd.android.package-archive",
+            "Content-Disposition": 'attachment; filename="PlayTranslateTV.apk"',
+        })
 
     async def _api_state(self, request: web.Request) -> web.Response:
         return web.json_response({
@@ -273,7 +298,12 @@ class DisplayServer:
 
     @property
     def clients(self) -> list[dict]:
-        return list(self._clients.values())
+        for _ in range(3):
+            try:
+                return [dict(c) for c in self._clients.values()]
+            except RuntimeError:  # changed size while the server thread updated it
+                continue
+        return []
 
     @property
     def running(self) -> bool:

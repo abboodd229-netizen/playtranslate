@@ -1,0 +1,19 @@
+[project]
+name = "playtranslate"
+version = "0.1.0"
+description = "Arabic subtitles for console games, shown on the TV"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+
+[project.optional-dependencies]
+offline = ["argostranslate>=1.9"]
+
+[project.gui-scripts]
+playtranslate = "playtranslate.app:main"
+
+[tool.setuptools.packages.find]
+include = ["playtranslate*"]
+
+[tool.setuptools.package-data]
+"playtranslate.server" = ["static/*"]

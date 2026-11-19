@@ -21,6 +21,7 @@ from ..capture import CaptureError
 from ..config import GameProfile, data_dir
 from ..controller import Controller
 from ..pipeline import SubtitleEvent
+from ..server import apk_path
 from .overlay import OverlayWindow
 from .region_picker import RegionPicker, bgr_to_qimage
 
@@ -417,10 +418,12 @@ class MainWindow(QMainWindow):
             self.addr_label.setText("الإرسال للتلفزيون متوقف.")
             return
         first = addrs[0] if addrs else f"127.0.0.1:{self.cfg.server_port}"
-        self.addr_label.setText(
-            f"عنوان هذا اللابتوب: <b dir='ltr'>{' أو '.join(addrs)}</b><br>"
-            f"تجربة من أي جوال أو متصفح على نفس الشبكة: "
-            f"<a href='http://{first}/overlay'>http://{first}/overlay</a>")
+        text = (f"عنوان هذا اللابتوب: <b dir='ltr'>{' أو '.join(addrs)}</b><br>"
+                f"تجربة من أي جوال أو متصفح على نفس الشبكة: "
+                f"<a href='http://{first}/overlay'>http://{first}/overlay</a>")
+        if apk_path() is not None:
+            text += f"<br>تثبيت تطبيق التلفزيون: في تطبيق Downloader بالتلفزيون اكتب <b dir='ltr'>http://{first}/tv.apk</b>"
+        self.addr_label.setText(text)
 
     # ============================================================= profiles
 

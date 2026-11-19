@@ -1,0 +1,17 @@
+# Laptop tool. Python 3.11 or 3.12 recommended (Windows 10 1809+ / Windows 11).
+PySide6-Essentials>=6.7,<7
+numpy>=1.26,<3
+opencv-python-headless>=4.9,<6
+mss>=9,<11
+aiohttp>=3.9,<4
+requests>=2.31,<3
+rapidocr>=3.4,<4
+onnxruntime>=1.17,<2
+# Windows built-in OCR (fast). Optional: the app falls back to RapidOCR without them.
+winrt-runtime; sys_platform == "win32"
+winrt-Windows.Foundation; sys_platform == "win32"
+winrt-Windows.Foundation.Collections; sys_platform == "win32"
+winrt-Windows.Globalization; sys_platform == "win32"
+winrt-Windows.Graphics.Imaging; sys_platform == "win32"
+winrt-Windows.Media.Ocr; sys_platform == "win32"
+winrt-Windows.Storage.Streams; sys_platform == "win32"
