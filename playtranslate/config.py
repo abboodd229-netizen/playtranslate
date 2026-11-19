@@ -109,8 +109,11 @@ class GameProfile:
     glossary: dict = field(default_factory=dict)
     # Show "Name:" speaker labels separately in a different colour.
     split_speaker: bool = True
+    # Minimum stroke contrast for text detection; lower finds faint text, higher ignores scenery.
+    sensitivity: int = 55
 
     def normalize(self) -> None:
+        self.sensitivity = int(_clamp(self.sensitivity, 25, 140))
         if self.text_mode not in ("light", "dark", "auto"):
             self.text_mode = "light"
         self.glossary = {

@@ -43,6 +43,8 @@ class SubtitleEvent:
     total_ms: float
     error: str = ""
     crop: np.ndarray | None = field(default=None, repr=False)
+    # English text of each segment (without speaker), aligned with `segments`.
+    sources: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -241,6 +243,7 @@ class Pipeline:
         self.on_subtitle(SubtitleEvent(
             english=english, arabic=result.text, segments=lines, origin=result.origin,
             ocr_ms=ocr_ms, translate_ms=result.ms, total_ms=total_ms, error=result.error, crop=crop,
+            sources=[s.source for s in result.segments],
         ))
 
     def _do_hide(self) -> None:
