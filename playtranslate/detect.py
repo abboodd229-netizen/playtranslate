@@ -119,6 +119,25 @@ def _text_rows(comps: list[tuple[int, int, int, int]]) -> list[list[tuple[int, i
 Box = tuple[int, int, int, int]
 
 
+def _merge_overlapping(boxes: list[Box]) -> list[Box]:
+    """Join boxes that are really one line (tall capitals and small letters can
+    form separate groups), so OCR never reads the same words twice."""
+    boxes = sorted(boxes, key=lambda b: (b[1], b[0]))
+    merged: list[Box] = []
+    for b in boxes:
+        for i, m in enumerate(merged):
+            overlap_y = min(b[1] + b[3], m[1] + m[3]) - max(b[1], m[1])
+            gap_x = max(b[0], m[0]) - min(b[0] + b[2], m[0] + m[2])
+            if overlap_y > 0.5 * min(b[3], m[3]) and gap_x < max(b[3], m[3]):
+                x0, y0 = min(b[0], m[0]), min(b[1], m[1])
+                x1, y1 = max(b[0] + b[2], m[0] + m[2]), max(b[1] + b[3], m[1] + m[3])
+                merged[i] = (x0, y0, x1 - x0, y1 - y0)
+                break
+        else:
+            merged.append(b)
+    return merged
+
+
 def _looks_like_text(mask: np.ndarray, min_ratio: float) -> tuple[bool, Box | None, list[Box]]:
     ratio = float(np.count_nonzero(mask)) / mask.size
     if ratio < min_ratio or ratio > 0.35:
@@ -144,6 +163,7 @@ def _looks_like_text(mask: np.ndarray, min_ratio: float) -> tuple[bool, Box | No
         rx1 = max(c[0] + c[2] for c in row)
         ry1 = max(c[1] + c[3] for c in row)
         row_boxes.append((rx0, ry0, rx1 - rx0, ry1 - ry0))
+    row_boxes = _merge_overlapping(row_boxes)
     pieces = [c for row in rows for c in row]
     x0 = min(c[0] for c in pieces)
     y0 = min(c[1] for c in pieces)

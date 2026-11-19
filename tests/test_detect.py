@@ -67,3 +67,11 @@ def test_text_on_bright_background_and_box():
     assert any(isinstance(e, Stable) for e in feed(det, frame("Hello there, stranger.", bright=True), times=3))
     det = SubtitleDetector()
     assert any(isinstance(e, Stable) for e in feed(det, frame("Inside a black box.", box=True), times=3))
+
+
+def test_overlapping_row_groups_merge_into_one_line():
+    from playtranslate.detect import _merge_overlapping
+
+    assert _merge_overlapping([(1, 1, 1156, 87), (795, 36, 259, 45)]) == [(1, 1, 1156, 87)]
+    # Two real lines stay separate.
+    assert len(_merge_overlapping([(0, 0, 500, 40), (0, 50, 480, 40)])) == 2
