@@ -32,7 +32,7 @@ class QtSink(QObject):
     shown = Signal(list)
     hidden = Signal()
 
-    def show(self, lines: list[dict]) -> None:
+    def show(self, lines: list[dict], mode: str = "subtitle") -> None:
         self.shown.emit(lines)
 
     def hide(self) -> None:
@@ -56,6 +56,7 @@ class Controller(QObject):
         self.cache = TranslationCache(data_dir() / "cache.sqlite3")
         self.server = DisplayServer(cfg.server_port, cfg.discovery_port)
         self.server.on_clients_changed = self.clients_changed.emit
+        self.server.on_translate_page = self.translate_page
         self.overlay_sink = QtSink()
         self.service = TranslationService(self.cache, self._build_engines(), cfg.active_profile,
                                           cfg.profile.glossary, cfg.use_context)
@@ -197,6 +198,15 @@ class Controller(QObject):
         else:
             self.status.emit("متوقف", "info")
         self.running_changed.emit(False)
+
+    def translate_page(self) -> bool:
+        """Whole-screen translation (button, phone remote). False when not running."""
+        p = self.pipeline
+        if p is None or not p.running:
+            self.status.emit("اضغط «ابدأ» أول، بعدها تقدر تترجم الشاشة كاملة.", "warn")
+            return False
+        p.request_page()
+        return True
 
     def stop(self) -> None:
         if self.pipeline:

@@ -56,10 +56,16 @@ class RapidOcr(OcrEngine):
                     lines.append(OcrLine(str(text), (x, y, w, h), float(score)))
         return sort_lines(lines)
 
-    def _detect_and_read(self, image: np.ndarray) -> list[OcrLine]:
-        img, scale = prepare(image, min_height=48, max_height=360)
+    def recognize_page(self, image: np.ndarray) -> list[OcrLine]:
+        # Keep full resolution (up to 1080 lines) so small menu text stays readable.
+        return self._detect_and_read(image, max_height=1080)
+
+    def _detect_and_read(self, image: np.ndarray, max_height: int = 360) -> list[OcrLine]:
+        img, scale = prepare(image, min_height=48, max_height=max_height)
         with self._lock:
-            result = self._engine(img)
+            # Say so explicitly: RapidOCR remembers use_det=False from _read_rows
+            # and would otherwise skip detection on every later call.
+            result = self._engine(img, use_det=True, use_cls=False, use_rec=True)
         boxes = getattr(result, "boxes", None)
         txts = getattr(result, "txts", None)
         scores = getattr(result, "scores", None)

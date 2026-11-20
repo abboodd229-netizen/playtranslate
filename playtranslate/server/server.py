@@ -12,12 +12,14 @@ methods are thread-safe and never block the caller.
 PROTOCOL (version 1), server -> client:
     {"type": "hello", "protocol": 1, "server": "<name>", "style": {...}}
     {"type": "show", "seq": 12, "lines": [{"speaker": "آرثر", "text": "..."}]}
+        optional "mode": "page" = a whole-screen translation (smaller text, centred)
     {"type": "hide", "seq": 12}
     {"type": "style", "style": {...}}
     {"type": "ping", "t": 1700000000.0}
 client -> server:
     {"type": "hello", "client": "tv", "name": "...", "protocol": 1}
     {"type": "pong", "t": ...}
+    {"type": "translate_page"}   (phone remote: translate the whole screen once)
 """
 
 from __future__ import annotations
@@ -90,6 +92,8 @@ class DisplayServer:
         self._stop_event: asyncio.Event | None = None
         self.start_error: str = ""
         self.on_clients_changed: Callable[[list[dict]], None] | None = None
+        # Called (from the server thread) when a phone asks for a whole-screen translation.
+        self.on_translate_page: Callable[[], None] | None = None
 
     # ---- lifecycle ---------------------------------------------------
 
@@ -130,6 +134,7 @@ class DisplayServer:
         app = web.Application()
         app.router.add_get("/", self._index)
         app.router.add_get("/overlay", self._overlay)
+        app.router.add_get("/remote", self._remote)
         app.router.add_get("/ws", self._ws)
         app.router.add_get("/api/state", self._api_state)
         app.router.add_get("/tv.apk", self._apk)
@@ -162,6 +167,11 @@ class DisplayServer:
 
     async def _overlay(self, request: web.Request) -> web.Response:
         html = resources.files(__package__).joinpath("static/overlay.html").read_text(encoding="utf-8")
+        return web.Response(text=html, content_type="text/html", charset="utf-8")
+
+    async def _remote(self, request: web.Request) -> web.Response:
+        """A phone page with one big button: translate the whole screen."""
+        html = resources.files(__package__).joinpath("static/remote.html").read_text(encoding="utf-8")
         return web.Response(text=html, content_type="text/html", charset="utf-8")
 
     async def _apk(self, request: web.Request) -> web.StreamResponse:
@@ -198,10 +208,19 @@ class DisplayServer:
                     data = json.loads(msg.data)
                 except ValueError:
                     continue
-                if isinstance(data, dict) and data.get("type") == "hello":
+                if not isinstance(data, dict):
+                    continue
+                if data.get("type") == "hello":
                     info["name"] = str(data.get("name", ""))[:64]
                     info["client"] = str(data.get("client", "browser"))[:16]
                     self._notify_clients()
+                elif data.get("type") == "translate_page":
+                    cb = self.on_translate_page
+                    if cb:
+                        try:
+                            cb()
+                        except Exception:
+                            log.exception("on_translate_page failed")
         except (ConnectionResetError, asyncio.CancelledError):
             pass
         finally:
@@ -280,10 +299,12 @@ class DisplayServer:
         except RuntimeError:
             pass
 
-    def show(self, lines: list[dict]) -> int:
+    def show(self, lines: list[dict], mode: str = "subtitle") -> int:
         """lines: [{"speaker": str, "text": str}]. Returns the sequence number."""
         self._seq += 1
         msg = {"type": "show", "seq": self._seq, "lines": lines}
+        if mode != "subtitle":
+            msg["mode"] = mode
         self._state = msg
         self._submit(msg)
         return self._seq

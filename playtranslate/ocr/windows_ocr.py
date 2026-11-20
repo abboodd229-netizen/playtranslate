@@ -82,7 +82,13 @@ class WindowsOcr(OcrEngine):
 
     def recognize(self, image: np.ndarray, rows=None) -> list[OcrLine]:
         # Windows OCR finds lines itself in a few milliseconds; rows are not needed.
-        img, scale = prepare(image, min_height=60, max_height=min(600, self._max_dim))
+        return self._read(image, max_height=600)
+
+    def recognize_page(self, image: np.ndarray) -> list[OcrLine]:
+        return self._read(image, max_height=1440)
+
+    def _read(self, image: np.ndarray, max_height: int) -> list[OcrLine]:
+        img, scale = prepare(image, min_height=60, max_height=min(max_height, self._max_dim))
         if img.shape[1] > self._max_dim:
             f = self._max_dim / img.shape[1]
             img = cv2.resize(img, None, fx=f, fy=f, interpolation=cv2.INTER_AREA)

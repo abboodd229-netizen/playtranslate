@@ -133,6 +133,10 @@ class MainWindow(QMainWindow):
         prof_box.addLayout(row)
         top.addLayout(prof_box, 3)
         v.addLayout(top)
+        page_btn = QPushButton("ترجم الشاشة كاملة مرة وحدة (القوائم والخريطة والمهام)")
+        page_btn.setToolTip("تقدر تضغطها من جوالك بعد من صفحة /remote المكتوبة تحت")
+        page_btn.clicked.connect(self.c.translate_page)
+        v.addWidget(page_btn)
 
         self.update_label = QLabel()
         self.update_label.setOpenExternalLinks(True)
@@ -429,6 +433,8 @@ class MainWindow(QMainWindow):
         text = (f"عنوان هذا اللابتوب: <b dir='ltr'>{' أو '.join(addrs)}</b><br>"
                 f"تجربة من أي جوال أو متصفح على نفس الشبكة: "
                 f"<a href='http://{first}/overlay'>http://{first}/overlay</a>")
+        text += (f"<br>زر «ترجم الشاشة كاملة» في جوالك: افتح "
+                 f"<a href='http://{first}/remote'>http://{first}/remote</a>")
         if apk_path() is not None:
             text += f"<br>تثبيت تطبيق التلفزيون: في تطبيق Downloader بالتلفزيون اكتب <b dir='ltr'>http://{first}/tv.apk</b>"
         self.addr_label.setText(text)
@@ -703,6 +709,9 @@ HELP_HTML = """
 <li>تبويب «الترجمة» ← أدخل مفتاح DeepL واضغط «اختبار».</li>
 <li>افتح تطبيق PlayTranslate في التلفزيون، ويتصل بنفسه. ثم اضغط «ابدأ» هنا.</li>
 </ol>
+<h2>ترجمة الشاشة كاملة</h2>
+<p>افتح القائمة أو الخريطة أو صفحة المهمة في اللعبة، واضغط «ترجم الشاشة كاملة» في تبويب التشغيل، أو الزر الكبير في صفحة
+<b>/remote</b> على جوالك (العنوان مكتوب في تبويب التشغيل). الترجمة تظهر في وسط التلفزيون 12 ثانية.</p>
 <h2>مشاكل شائعة</h2>
 <ul>
 <li><b>التلفزيون ما يتصل:</b> تأكد إن اللابتوب والتلفزيون على نفس الشبكة، ووافقت على «السماح» لما سألك جدار الحماية في ويندوز

@@ -220,7 +220,8 @@ class OverlayService : Service() {
                     "show" -> {
                         val lines = msg.optJSONArray("lines") ?: JSONArray()
                         ServiceState.linesShown++
-                        main.post { overlay.show(lines) }
+                        val page = msg.optString("mode") == "page"
+                        main.post { overlay.show(lines, page) }
                     }
                     "hide" -> main.post { overlay.hide() }
                     "ping" -> webSocket.send(JSONObject().put("type", "pong").put("t", msg.opt("t")).toString())

@@ -21,7 +21,7 @@ import numpy as np
 from .capture import CaptureError, Frame, FrameSource
 from .detect import DetectorSettings, Gone, Stable, SubtitleDetector
 from .ocr import OcrEngine, OcrUnavailable, create_engine
-from .textproc import Segment, joined, similar, to_segments
+from .textproc import Segment, joined, page_segments, similar, to_segments
 from .translate import TranslationResult, TranslationService
 from .winapi import keep_awake
 
@@ -29,7 +29,8 @@ log = logging.getLogger(__name__)
 
 
 class Sink(Protocol):
-    def show(self, lines: list[dict]) -> object: ...
+    # mode "subtitle" (normal) or "page" (a whole-screen translation: smaller text, centred).
+    def show(self, lines: list[dict], mode: str = "subtitle") -> object: ...
     def hide(self) -> None: ...
 
 
@@ -53,6 +54,8 @@ class PipelineSettings:
     fps: int = 10
     linger_ms: int = 700
     split_speaker: bool = True
+    # How long a whole-screen translation stays on the TV.
+    page_seconds: float = 12.0
     detector: DetectorSettings = field(default_factory=DetectorSettings)
 
 
@@ -80,6 +83,8 @@ class Pipeline:
         self._hide_at: float | None = None
         self._last_geometry: tuple | None = None
         self.source: FrameSource | None = None
+        self._page_request = threading.Event()
+        self._page_until: float | None = None
 
         # Callbacks (called from worker threads; GUI must marshal to its thread).
         self.on_status: Callable[[str, str], None] = lambda text, level: None
@@ -109,6 +114,13 @@ class Pipeline:
     @property
     def running(self) -> bool:
         return bool(self._thread and self._thread.is_alive())
+
+    def request_page(self) -> None:
+        """Translate everything on screen once (menus, map, mission text).
+
+        Asking again while it is shown hides it early. Thread-safe.
+        """
+        self._page_request.set()
 
     def update_settings(self, settings: PipelineSettings) -> None:
         """Applied by the worker at the start of its next frame."""
@@ -180,6 +192,19 @@ class Pipeline:
                 self._last_geometry = geometry
                 self.on_geometry(frame)
 
+            if self._page_request.is_set():
+                self._page_request.clear()
+                if self._page_until is not None:
+                    self._end_page()
+                else:
+                    self._do_page()
+            if self._page_until is not None:
+                # A whole-screen translation is up: subtitles wait until it ends.
+                if time.monotonic() >= self._page_until:
+                    self._end_page()
+                self._stop.wait(max(0.0, interval - (time.perf_counter() - t0)))
+                continue
+
             event = self._detector.feed(frame.crop)
             if isinstance(event, Stable):
                 self._handle_stable(event, frame.timestamp)
@@ -248,6 +273,51 @@ class Pipeline:
             ocr_ms=ocr_ms, translate_ms=result.ms, total_ms=total_ms, error=result.error, crop=crop,
             sources=[s.source for s in result.segments],
         ))
+
+    def _do_page(self) -> None:
+        self.on_status("أقرأ الشاشة كاملة…", "info")
+        t_ocr = time.perf_counter()
+        try:
+            full = self.source.grab_full()
+            lines = self._ocr.recognize_page(full)
+        except Exception as exc:
+            log.exception("Page read failed")
+            self.on_status(f"تعذّرت قراءة الشاشة: {exc}", "warn")
+            return
+        ocr_ms = (time.perf_counter() - t_ocr) * 1000
+        segments = page_segments(lines)
+        if not segments:
+            self.on_status("ما لقيت نص إنجليزي على الشاشة.", "warn")
+            return
+        result: TranslationResult = self.translator.translate(segments)
+        shown = [{"speaker": "", "text": s.target} for s in result.segments]
+        with self._display_lock:
+            self._generation += 1  # a subtitle still being translated must not replace the page
+            for sink in self.sinks:
+                try:
+                    sink.show(shown, mode="page")
+                except Exception:
+                    log.exception("Sink %r failed", sink)
+            self._showing = True
+            self._shown_english = ""
+            self._hide_at = None
+        self._page_until = time.monotonic() + self.settings.page_seconds
+        english = "\n".join(s.text for s in segments)
+        self.on_status(f"ترجمة الشاشة معروضة لمدة {self.settings.page_seconds:.0f} ثانية.", "ok")
+        if result.error:
+            self.on_status(result.error, "warn")
+        self.on_subtitle(SubtitleEvent(
+            english=english, arabic=result.text, segments=shown, origin=result.origin,
+            ocr_ms=ocr_ms, translate_ms=result.ms, total_ms=ocr_ms + result.ms, error=result.error,
+            sources=[s.source for s in result.segments],
+        ))
+
+    def _end_page(self) -> None:
+        self._page_until = None
+        self._do_hide()
+        # Report the subtitle that is on screen now, even if it was there before.
+        self._detector.reset()
+        self.on_status(f"يعمل ({self._ocr.name})", "ok")
 
     def _do_hide(self) -> None:
         with self._display_lock:

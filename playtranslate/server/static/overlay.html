@@ -16,6 +16,7 @@
     font-size: var(--size); line-height: 1.5; text-align: center; color: var(--fg);
     transition: opacity .12s; opacity: 0; white-space: pre-wrap; unicode-bidi: plaintext; }
   #box.show { opacity: 1; }
+  #box.page { bottom: auto; top: 50%; transform: translate(-50%, -50%); font-size: calc(var(--size) * 0.62); max-width: 90vw; }
   #box.outline { text-shadow: 0 0 3px #000, 0 0 3px #000, 0 2px 4px #000; }
   .speaker { color: var(--speaker); font-weight: 700; }
   #hint { position: fixed; top: 40%; width: 100%; text-align: center; font-size: 18px; opacity: .5; }
@@ -55,8 +56,9 @@
     box.classList.toggle("outline", style.outline !== false);
   }
 
-  function show(lines) {
+  function show(lines, mode) {
     box.textContent = "";
+    box.classList.toggle("page", mode === "page");
     lines.forEach(function (line, i) {
       if (i > 0) box.appendChild(document.createElement("br"));
       if (line.speaker) {
@@ -83,7 +85,7 @@
       var msg;
       try { msg = JSON.parse(ev.data); } catch (e) { return; }
       if (msg.type === "hello" || msg.type === "style") { style = msg.style || {}; applyStyle(); }
-      else if (msg.type === "show") show(msg.lines || []);
+      else if (msg.type === "show") show(msg.lines || [], msg.mode);
       else if (msg.type === "hide") box.classList.remove("show");
       else if (msg.type === "ping") ws.send(JSON.stringify({ type: "pong", t: msg.t }));
     };

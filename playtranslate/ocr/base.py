@@ -29,6 +29,13 @@ class OcrEngine:
         """
         raise NotImplementedError
 
+    def recognize_page(self, image: np.ndarray) -> list[OcrLine]:
+        """Every line of text on a whole screen (menus, map, mission text).
+
+        Slower than reading a subtitle crop; used only when the user asks.
+        """
+        return self.recognize(image)
+
     def warm_up(self) -> None:
         """Load models now so the first subtitle is not slow."""
         blank = np.zeros((64, 256, 3), np.uint8)

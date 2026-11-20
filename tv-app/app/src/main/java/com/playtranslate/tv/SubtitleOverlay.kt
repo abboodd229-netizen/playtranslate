@@ -37,6 +37,9 @@ class SubtitleOverlay(private val context: Context) {
     private var bottomMargin = 0.17
     private var maxWidth = 0.8
 
+    // true while a whole-screen translation (many short lines) is shown: smaller, centred.
+    private var pageMode = false
+
     private val regular: Typeface by lazy { context.resources.getFont(R.font.noto_naskh_arabic) }
 
     /** Adds the window. Returns false when the overlay permission is missing or refused. */
@@ -94,8 +97,12 @@ class SubtitleOverlay(private val context: Context) {
         applyStyle()
     }
 
-    fun show(lines: JSONArray) {
+    fun show(lines: JSONArray, page: Boolean = false) {
         val tv = view ?: return
+        if (page != pageMode) {
+            pageMode = page
+            applyStyle()
+        }
         val text = SpannableStringBuilder()
         for (i in 0 until lines.length()) {
             val line = lines.optJSONObject(i) ?: continue
@@ -123,20 +130,27 @@ class SubtitleOverlay(private val context: Context) {
         val metrics = context.resources.displayMetrics
         val screenH = minOf(metrics.heightPixels, metrics.widthPixels)
         val screenW = maxOf(metrics.heightPixels, metrics.widthPixels)
-        val sizePx = fontSize * screenH / 1080f
+        val sizePx = fontSize * screenH / 1080f * (if (pageMode) 0.62f else 1f)
         tv.setTextSize(TypedValue.COMPLEX_UNIT_PX, sizePx)
         tv.setTextColor(textColor)
-        tv.maxWidth = (screenW * maxWidth).roundToInt()
+        tv.maxWidth = (screenW * (if (pageMode) maxOf(maxWidth, 0.9) else maxWidth)).roundToInt()
         val pad = (sizePx * 0.35f).roundToInt()
         tv.setPadding(pad, pad / 2, pad, pad / 2)
         tv.setLineSpacing(0f, 1.15f)
         if (outline) tv.setShadowLayer(sizePx * 0.12f, 0f, 0f, Color.BLACK) else tv.setShadowLayer(0f, 0f, 0f, 0)
-        val alpha = (bgOpacity * 255).roundToInt().coerceIn(0, 255)
+        val opacity = if (pageMode) maxOf(bgOpacity, 0.8) else bgOpacity
+        val alpha = (opacity * 255).roundToInt().coerceIn(0, 255)
         tv.background = if (alpha == 0) null else GradientDrawable().apply {
             setColor(Color.argb(alpha, Color.red(bgColor), Color.green(bgColor), Color.blue(bgColor)))
             cornerRadius = pad * 0.6f
         }
-        lp.y = (screenH * bottomMargin).roundToInt()
+        if (pageMode) {
+            lp.gravity = Gravity.CENTER
+            lp.y = 0
+        } else {
+            lp.gravity = Gravity.BOTTOM or Gravity.CENTER_HORIZONTAL
+            lp.y = (screenH * bottomMargin).roundToInt()
+        }
         runCatching { wm.updateViewLayout(tv, lp) }
     }
 

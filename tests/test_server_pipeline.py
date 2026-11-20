@@ -110,9 +110,9 @@ class RecordingSink:
         self.events = []
         self.lock = threading.Lock()
 
-    def show(self, lines):
+    def show(self, lines, mode="subtitle"):
         with self.lock:
-            self.events.append(("show", lines, time.monotonic()))
+            self.events.append(("page" if mode == "page" else "show", lines, time.monotonic()))
 
     def hide(self):
         with self.lock:
@@ -147,3 +147,50 @@ def test_pipeline_end_to_end(rapid_engine):
     for ev in subtitles:
         assert ev.total_ms < 1000, ev
         print(f"OCR {ev.ocr_ms:.0f} ms, total {ev.total_ms:.0f} ms")
+
+
+def _menu_frame():
+    """A pause-menu-like screen with a subtitle under it."""
+    import numpy as np
+    from PIL import ImageDraw
+
+    from synth import background, font
+
+    img = background(1280, 720, seed=3)
+    d = ImageDraw.Draw(img)
+    d.rectangle([60, 60, 520, 470], fill=(10, 10, 10))
+    for i, item in enumerate(["Resume Game", "Mission Objectives", "Settings", "Quit to Main Menu"]):
+        d.text((90, 90 + i * 90), item, font=font(40), fill=(255, 255, 255))
+    f = font(34)
+    line = "Meet Jason at the marina."
+    w = d.textlength(line, font=f)
+    d.text(((1280 - w) / 2, 597), line, font=f, fill=(255, 255, 255), stroke_width=3, stroke_fill=(0, 0, 0))
+    return np.array(img)[:, :, ::-1].copy()
+
+
+def test_whole_screen_translation(rapid_engine):
+    menu = _menu_frame()
+    script = [(menu, 4.5), (frame(None, seed=3), 1.0)]
+    svc = TranslationService(TranslationCache(":memory:"), [FakeEngine()], "g", {})
+    sink = RecordingSink()
+    stopped = threading.Event()
+    p = Pipeline(lambda: ScriptSource(script, Region()), svc, [sink],
+                 PipelineSettings(fps=10, linger_ms=200, page_seconds=1.5), ocr_engine=rapid_engine)
+    p.on_stopped = lambda reason: stopped.set()
+    p.start()
+    time.sleep(1.0)
+    p.request_page()
+    assert stopped.wait(20)
+    p.shutdown()
+
+    kinds = [e[0] for e in sink.events]
+    assert "page" in kinds, sink.events
+    page = sink.events[kinds.index("page")][1]
+    texts = " | ".join(line["text"] for line in page)
+    for item in ("Mission Objectives", "Settings", "Quit to Main Menu"):
+        assert item in texts, texts
+    # Menu items are translated one by one, never glued into one sentence.
+    assert all(not line["speaker"] for line in page) and len(page) >= 4
+    # After the page times out the subtitle under it is shown again.
+    after = kinds[kinds.index("page") + 1:]
+    assert after[:2] == ["hide", "show"], sink.events

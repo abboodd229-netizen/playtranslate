@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0F1115">
+<title>PlayTranslate · ريموت</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; background: #0F1115; color: #ECEEF2;
+         font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", sans-serif;
+         display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 22px; padding: 24px 16px; }
+  h1 { margin: 0; font-size: 20px; color: #A6ADBB; font-weight: 600; }
+  button { width: min(420px, 100%); min-height: 180px; border: 0; border-radius: 28px; background: #FFC94D; color: #14161B;
+           font: inherit; font-size: 26px; font-weight: 700; line-height: 1.5; cursor: pointer; touch-action: manipulation; }
+  button:active { transform: scale(0.98); background: #FFD875; }
+  button:disabled { background: #3A4152; color: #8C94A4; }
+  #state { font-size: 15px; color: #8C94A4; min-height: 1.5em; text-align: center; }
+  .ok { color: #6ED3C9 !important; }
+  p.help { max-width: 420px; margin: 0; color: #8C94A4; font-size: 14px; line-height: 1.8; text-align: center; }
+</style>
+</head>
+<body>
+  <h1>PlayTranslate</h1>
+  <button id="go" disabled>ترجم الشاشة كاملة</button>
+  <div id="state">جارٍ الاتصال باللابتوب…</div>
+  <p class="help">افتح قائمة أو خريطة أو صفحة مهمة في اللعبة، واضغط الزر. الترجمة تظهر على التلفزيون لمدة قصيرة. اضغطه مرة ثانية لإخفائها بدري.</p>
+<script>
+(function () {
+  var btn = document.getElementById("go"), state = document.getElementById("state"), ws = null, delay = 1000;
+  function connect() {
+    ws = new WebSocket((location.protocol === "https:" ? "wss://" : "ws://") + location.host + "/ws");
+    ws.onopen = function () {
+      delay = 1000; btn.disabled = false;
+      state.textContent = "متصل باللابتوب"; state.className = "ok";
+      ws.send(JSON.stringify({ type: "hello", client: "remote", name: "phone", protocol: 1 }));
+    };
+    ws.onmessage = function (e) {
+      try { var m = JSON.parse(e.data); if (m.type === "ping") ws.send(JSON.stringify({ type: "pong", t: m.t })); } catch (err) {}
+    };
+    ws.onclose = function () {
+      btn.disabled = true; state.className = "";
+      state.textContent = "انقطع الاتصال. أحاول من جديد…";
+      setTimeout(connect, delay); delay = Math.min(delay * 2, 8000);
+    };
+  }
+  btn.addEventListener("click", function () {
+    if (!ws || ws.readyState !== 1) return;
+    ws.send(JSON.stringify({ type: "translate_page" }));
+    if (navigator.vibrate) navigator.vibrate(30);
+    state.textContent = "تم الإرسال. شوف التلفزيون."; state.className = "ok";
+  });
+  connect();
+})();
+</script>
+</body>
+</html>

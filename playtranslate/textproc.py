@@ -76,6 +76,29 @@ def to_segments(lines: list[OcrLine], split_speaker: bool = True) -> list[Segmen
     return segments
 
 
+def page_segments(lines: list[OcrLine], limit: int = 16) -> list[Segment]:
+    """One segment per line for a whole-screen read.
+
+    Menu items and labels are separate things, so lines are never joined the
+    way subtitle lines are. Numbers, single letters and repeats are dropped,
+    and only the `limit` longest lines are kept (in screen order) so the TV
+    is not flooded.
+    """
+    seen: set[str] = set()
+    picked: list[tuple[int, str]] = []
+    for i, raw in enumerate(lines):
+        text = clean_line(raw.text)
+        key = text.lower()
+        if not text or _is_junk(text) or key in seen:
+            continue
+        seen.add(key)
+        picked.append((i, text))
+    if len(picked) > limit:
+        keep = {i for i, _ in sorted(picked, key=lambda p: len(p[1]), reverse=True)[:limit]}
+        picked = [p for p in picked if p[0] in keep]
+    return [Segment(text) for _, text in picked]
+
+
 def cache_key(text: str) -> str:
     """Stable key so OCR noise in case/spacing/quotes hits the same cache entry."""
     text = clean_line(text).lower()
