@@ -115,7 +115,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <!-- ============ TV PREVIEW ============ -->
 <section class="wrap" style="padding-top: 64px">
 <figure style="margin: 0; display: flex; flex-direction: column; gap: 14px">
-<div style="border-radius: 22px; overflow: hidden; border: 1px solid #262B36; background: #111722"><svg viewBox="0 0 1440 900" role="img" aria-label="A player seen from behind on a couch, watching a TV that shows a game scene with an Arabic subtitle. A laptop on a side table sends the translation to the TV over Wi-Fi." style="display: block; width: 100%; height: auto">
+<div style="border-radius: 22px; overflow: hidden; border: 1px solid #262B36; background: #111722"><svg viewBox="0 0 1440 900" role="img" aria-label="A player seen from behind on a couch, watching a TV that shows a game scene with an Arabic subtitle. A laptop or phone on a side table sends the translation to the TV over Wi-Fi." style="display: block; width: 100%; height: auto">
 <defs>
 <radialGradient id="pt-tvglow" cx="50%" cy="45%" r="55%">
 <stop offset="0%" stop-color="#FF9E5E" stop-opacity="0.28"></stop>
@@ -156,10 +156,23 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <circle cx="784" cy="618" r="4" fill="#8FB3FF"></circle>
 <rect x="1150" y="560" width="200" height="16" rx="6" fill="#2A3242"></rect>
 <rect x="1240" y="576" width="20" height="90" fill="#2A3242"></rect>
+<g data-on="laptop">
 <path d="M1176 560 L1196 492 H1316 L1324 560 Z" fill="#1C222B"></path>
 <path d="M1184 554 L1201 498 H1310 L1316 554 Z" fill="#253042"></path>
 <path d="M1236 512 H1268 C1276 512 1281 518 1282 527 C1283 536 1280 540 1276 540 C1272 540 1270 537 1267 534 H1260 L1255 543 L1250 534 H1244 C1241 537 1239 540 1235 540 C1231 540 1228 536 1229 527 C1230 518 1235 512 1236 512 Z" fill="#FFC94D"></path>
 <path d="M1162 560 H1338" stroke="#323C4E" stroke-width="6" stroke-linecap="round"></path>
+</g>
+<g data-on="ios android">
+<rect x="1190" y="478" width="132" height="68" rx="14" fill="#1C222B" stroke="#323C4E" stroke-width="2"></rect>
+<rect x="1200" y="484" width="112" height="56" rx="7" fill="url(#pt-sky)"></rect>
+<circle cx="1262" cy="520" r="10" fill="#FFE3A3" opacity="0.9"></circle>
+<rect x="1200" y="522" width="112" height="18" fill="#1C2A4A"></rect>
+<path d="M1200 522 H1312" stroke="#FFD08A" stroke-width="1.5" opacity="0.6"></path>
+<rect x="1222" y="529" width="68" height="7" rx="3" fill="#0E1116" opacity="0.8"></rect>
+<circle cx="1195" cy="512" r="1.8" fill="#3A4152"></circle>
+<path d="M1240 546 L1232 560 H1280 L1272 546 Z" fill="#1C222B"></path>
+<path d="M1206 560 H1306" stroke="#323C4E" stroke-width="6" stroke-linecap="round"></path>
+</g>
 <path d="M1190 482 C1150 380 1100 330 1060 320" stroke="#FFC94D" stroke-width="4" stroke-dasharray="4 14" stroke-linecap="round" fill="none"></path>
 <path d="M1218 452 C1226 444 1238 444 1246 452 M1208 440 C1222 426 1242 426 1256 440" stroke="#FFC94D" stroke-width="5" stroke-linecap="round" fill="none"></path>
 <path d="M120 900 V780 C120 740 150 712 190 712 H1250 C1290 712 1320 740 1320 780 V900 Z" fill="#1E2633"></path>
@@ -173,7 +186,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <rect x="636" y="632" width="22" height="46" rx="10" fill="#2A3242"></rect>
 <rect x="782" y="632" width="22" height="46" rx="10" fill="#2A3242"></rect>
 </svg></div>
-<figcaption style="color: #A6ADBB; font-size: 15px; text-align: center">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، واللابتوب يقرأ الحوار ويرسل الترجمة العربية للتلفزيون عبر الواي فاي. (رسمة توضيحية)</figcaption>
+<figcaption style="color: #A6ADBB; font-size: 15px; text-align: center"><pt-if data-on="laptop">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، واللابتوب يقرأ الحوار ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if><pt-if data-on="ios">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، والآيفون أو الآيباد يقرأ الحوار من PS Remote Play ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if><pt-if data-on="android">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، وجوال الأندرويد يقرأ الحوار من PS Remote Play ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if> (رسمة توضيحية)</figcaption>
 </figure>
 </section>
 
@@ -889,7 +902,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 var A='#FFC94D',ids=['laptop','ios','android'];
 function tile(on){return 'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;padding:18px 14px;border-radius:18px;line-height:1.5;'+(on?'background:'+A+';color:#14161B;border:2px solid '+A+';':'background:#171A21;color:#ECEEF2;border:2px solid #2E3442;');}
 function set(p,push){
-  document.querySelectorAll('pt-if').forEach(function(e){e.hidden=e.getAttribute('data-on').split(' ').indexOf(p)<0;});
+  document.querySelectorAll('[data-on]').forEach(function(e){var off=e.getAttribute('data-on').split(' ').indexOf(p)<0;if(e.tagName==='PT-IF')e.hidden=off;else e.style.display=off?'none':'';});
   document.querySelectorAll('[data-pick]').forEach(function(b){var on=b.getAttribute('data-pick')===p;b.style.cssText=tile(on);b.setAttribute('aria-pressed',on?'true':'false');});
   if(push){try{history.replaceState(null,'','#'+p);}catch(e){}}
 }
