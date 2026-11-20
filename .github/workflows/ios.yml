@@ -88,6 +88,11 @@ jobs:
         run: |
           APP=build/device/Build/Products/Release-iphoneos/PlayTranslate.app
           test -d "$APP/PlugIns/Broadcast.appex"
+          # The built-in Remote Play must really be linked in, not dead-stripped away.
+          ls -lh "$APP/PlayTranslate"
+          N=$(strings "$APP/PlayTranslate" | grep -ciE "chiaki|takion" || true)
+          echo "Remote Play strings in the app: $N"
+          test "$N" -gt 20
           codesign --force --sign - --entitlements Broadcast/Broadcast.entitlements "$APP/PlugIns/Broadcast.appex"
           codesign --force --sign - --entitlements App/PlayTranslate.entitlements "$APP"
           codesign -d --entitlements - "$APP/PlugIns/Broadcast.appex"
