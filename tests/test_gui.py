@@ -29,8 +29,10 @@ def test_window_runs_images_source(tmp_path, qapp):
     events = []
     c.subtitle.connect(events.append)
     c.start()
+    # Wait for the first subtitle (OCR warm-up can be slow on a busy CI machine), up to 30 s.
     loop = QEventLoop()
-    QTimer.singleShot(4000, loop.quit)
+    c.subtitle.connect(lambda _ev: QTimer.singleShot(1500, loop.quit))
+    QTimer.singleShot(30000, loop.quit)
     loop.exec()
     assert events and events[0].english.startswith("ARTHUR")
     assert w.history.count() >= 1
