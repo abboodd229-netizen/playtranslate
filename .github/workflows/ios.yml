@@ -5,6 +5,8 @@ name: iOS app
 on:
   push:
     branches: ["**"]
+    # Pushing a tag like ios-v0.1.0 publishes the IPA (tags never match build.yml's "v*").
+    tags: ["ios-v*"]
     paths: ["mobile/**", "packs/**", ".github/workflows/ios.yml"]
   pull_request:
     paths: ["mobile/**", "packs/**", ".github/workflows/ios.yml"]
@@ -79,12 +81,12 @@ jobs:
           if-no-files-found: error
 
       - name: Publish pre-release
-        if: github.event_name == 'workflow_dispatch' && startsWith(inputs.release_tag, 'ios-')
+        if: startsWith(github.ref, 'refs/tags/ios-') || (github.event_name == 'workflow_dispatch' && startsWith(inputs.release_tag, 'ios-'))
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ inputs.release_tag }}
+          tag_name: ${{ inputs.release_tag || github.ref_name }}
           target_commitish: ${{ github.sha }}
-          name: PlayTranslate iPhone/iPad ${{ inputs.release_tag }}
+          name: PlayTranslate iPhone/iPad ${{ inputs.release_tag || github.ref_name }}
           # Never "latest": the laptop download links use releases/latest.
           make_latest: "false"
           prerelease: true

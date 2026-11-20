@@ -14,5 +14,5 @@ the /24 network; the TV app's manual address field also works.
 Build: CI (`ios.yml`, macOS runner) runs `xcodegen generate`, unit tests on a simulator, an
 unsigned device build, then ad-hoc signs it to keep the App Group entitlement and zips
 `PlayTranslate.ipa`. Players sideload it for free with SideStore/AltStore
-(see `docs/INSTALL-ios-ar.md`). A manual run with `release_tag=ios-vX.Y.Z` publishes a
+(see `docs/INSTALL-ios-ar.md`). Pushing a tag `ios-vX.Y.Z` (or a manual run with `release_tag=ios-vX.Y.Z`) publishes a
 pre-release that is never marked "latest", so the laptop's `releases/latest` links stay put.
