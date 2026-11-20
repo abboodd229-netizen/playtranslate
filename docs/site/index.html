@@ -6,6 +6,7 @@
 <title>دليل PlayTranslate</title>
 <meta name="description" content="دليل تثبيت واستخدام PlayTranslate: ترجمة حوارات ألعاب البلايستيشن للعربي على التلفزيون.">
 <meta name="theme-color" content="#0F1115">
+<link rel="icon" type="image/svg+xml" href="img/logo.svg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&amp;family=Noto+Naskh+Arabic:wght@500;700&amp;family=Readex+Pro:wght@500;700&amp;display=swap" rel="stylesheet">
@@ -44,7 +45,7 @@ code{font-family:ui-monospace,Consolas,monospace;direction:ltr;unicode-bidi:isol
 <header style="border-bottom: 1px solid #262B36; background: #13161C">
 <div class="wrap" style="padding-top: 72px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 28px">
 <div style="display: flex; align-items: center; gap: 12px; color: #A6ADBB; font-size: 15px">
-<span style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: #FFC94D; color: #14161B; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 18px">ع</span>
+<svg width="48" height="38" viewBox="0 0 240 190" aria-hidden="true"><path d="M62 28 H178 C214 28 232 58 236 98 C240 138 228 164 206 164 C188 164 178 148 168 134 H138 L120 176 L102 134 H72 C62 148 52 164 34 164 C12 164 0 138 4 98 C8 58 26 28 62 28 Z" fill="#FFC94D"></path><path d="M147 52 C138 41 112 41 106 56 C100 71 116 80 136 80 C108 82 90 92 92 108 C94 124 120 130 150 122" fill="none" stroke="#14161B" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"></path></svg>
 <span>PlayTranslate · الإصدار 0.3.0 · فكرة وتطوير عبدالله الغزواني</span>
 </div>
 <h1 class="hero-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 60px; line-height: 1.25; max-width: 900px">العب بالإنجليزي، واقرأ الحوار <span style="color: #FFC94D">بالعربي على التلفزيون</span></h1>
@@ -65,15 +66,68 @@ code{font-family:ui-monospace,Consolas,monospace;direction:ltr;unicode-bidi:isol
 <!-- ============ TV PREVIEW ============ -->
 <section class="wrap" style="padding-top: 64px">
 <figure style="margin: 0; display: flex; flex-direction: column; gap: 14px">
-<div class="tv" style="background: #050608; border-radius: 22px; padding: 14px; border: 1px solid #262B36">
-<div style="position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 16 / 9">
-<img src="img/scene_clean.jpg" alt="مشهد من لعبة على التلفزيون" style="display: block; width: 100%; height: 100%; object-fit: cover">
-<div style="position: absolute; left: 0; right: 0; bottom: 14%; display: flex; justify-content: center">
-<p class="tv-sub" style="margin: 0; padding: 0.35em 0.8em; background: rgba(0,0,0,0.6); border-radius: 0.3em; font-family: 'Noto Naskh Arabic', serif; font-weight: 700; color: #FFFFFF; line-height: 1.5; text-shadow: 0 0 3px #000, 0 0 3px #000"><span style="color: #FFD54F">آرثر:</span> يجب أن نغادر البلدة قبل الفجر.</p>
-</div>
-</div>
-</div>
-<figcaption style="color: #A6ADBB; font-size: 15px; text-align: center">هذا اللي بتشوفه على التلفزيون: الترجمة العربية فوق صورة اللعبة، واسم المتكلم بلون مختلف. (صورة توضيحية)</figcaption>
+<div style="border-radius: 22px; overflow: hidden; border: 1px solid #262B36; background: #111722"><svg viewBox="0 0 1440 900" role="img" aria-label="A player seen from behind on a couch, watching a TV that shows a game scene with an Arabic subtitle. A laptop on a side table sends the translation to the TV over Wi-Fi." style="display: block; width: 100%; height: auto">
+<defs>
+<radialGradient id="pt-tvglow" cx="50%" cy="45%" r="55%">
+<stop offset="0%" stop-color="#FF9E5E" stop-opacity="0.28"></stop>
+<stop offset="100%" stop-color="#FF9E5E" stop-opacity="0"></stop>
+</radialGradient>
+<linearGradient id="pt-sky" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0%" stop-color="#2B1E4F"></stop>
+<stop offset="45%" stop-color="#C2477A"></stop>
+<stop offset="75%" stop-color="#FF9E5E"></stop>
+<stop offset="100%" stop-color="#FFD08A"></stop>
+</linearGradient>
+<clipPath id="pt-screen"><rect x="400" y="200" width="640" height="360" rx="6"></rect></clipPath>
+</defs>
+<rect x="0" y="0" fill="#111722"></rect>
+<ellipse cx="720" cy="400" rx="760" ry="460" fill="url(#pt-tvglow)"></ellipse>
+<rect x="0" y="660" width="1440" height="240" fill="#0B0F17"></rect>
+<rect x="380" y="180" width="680" height="400" rx="16" fill="#05070A"></rect>
+<g clip-path="url(#pt-screen)">
+<rect x="400" y="200" width="640" height="360" fill="url(#pt-sky)"></rect>
+<circle cx="760" cy="420" r="70" fill="#FFE3A3" opacity="0.9"></circle>
+<rect x="400" y="440" width="640" height="120" fill="#1C2A4A"></rect>
+<path d="M400 440 H1040" stroke="#FFD08A" stroke-width="3" opacity="0.6"></path>
+<path d="M400 440 V378 H430 V350 H462 V392 H486 V330 H520 V400 H548 V362 H580 V440 Z" fill="#1A1430"></path>
+<path d="M880 440 V368 H904 V318 H940 V386 H962 V340 H1000 V396 H1040 V440 Z" fill="#1A1430"></path>
+<path d="M622 440 C626 392 640 352 664 322" stroke="#120E22" stroke-width="9" fill="none" stroke-linecap="round"></path>
+<path d="M664 322 C640 312 618 318 600 334 M664 322 C650 300 628 296 610 300 M664 322 C682 302 704 300 722 310 M664 322 C690 318 708 330 716 346" stroke="#120E22" stroke-width="8" fill="none" stroke-linecap="round"></path>
+<path d="M842 440 C838 404 828 376 810 354" stroke="#120E22" stroke-width="7" fill="none" stroke-linecap="round"></path>
+<path d="M810 354 C792 346 776 350 764 362 M810 354 C800 338 784 334 770 336 M810 354 C824 340 840 340 852 348" stroke="#120E22" stroke-width="6" fill="none" stroke-linecap="round"></path>
+<path d="M470 486 H520 M560 470 H640 M760 498 H820 M900 478 H960" stroke="#FFD08A" stroke-width="3" opacity="0.35" stroke-linecap="round"></path>
+<rect x="476" y="486" width="488" height="56" rx="10" fill="#0E1116" opacity="0.86"></rect>
+<text x="944" y="522" text-anchor="end" font-family="Tajawal, sans-serif" font-weight="800" font-size="24" fill="#FFC94D">لوسيا:</text>
+<text x="860" y="522" text-anchor="end" font-family="Tajawal, sans-serif" font-weight="700" font-size="24" fill="#F5F3EE">خلّنا نطلع من هنا قبل يوصلون!</text>
+<rect x="926" y="216" width="98" height="26" rx="13" fill="#0E1116" opacity="0.86"></rect>
+<path d="M944 222 H962 C967 222 970 226 971 232 C972 238 970 241 967 241 C964 241 963 239 961 237 H957 L954 243 L951 237 H947 C945 239 944 241 941 241 C938 241 936 238 937 232 C938 226 941 222 944 222 Z" fill="#FFC94D"></path>
+<text x="1014" y="234" text-anchor="end" font-family="Tajawal, sans-serif" font-weight="800" font-size="13" fill="#F5F3EE">مترجم</text>
+</g>
+<rect x="300" y="590" width="840" height="56" rx="10" fill="#1A2130"></rect>
+<rect x="636" y="604" width="168" height="28" rx="6" fill="#0E1116"></rect>
+<circle cx="784" cy="618" r="4" fill="#8FB3FF"></circle>
+<rect x="1150" y="560" width="200" height="16" rx="6" fill="#2A3242"></rect>
+<rect x="1240" y="576" width="20" height="90" fill="#2A3242"></rect>
+<path d="M1176 560 L1196 492 H1316 L1324 560 Z" fill="#1C222B"></path>
+<path d="M1184 554 L1201 498 H1310 L1316 554 Z" fill="#253042"></path>
+<path d="M1236 512 H1268 C1276 512 1281 518 1282 527 C1283 536 1280 540 1276 540 C1272 540 1270 537 1267 534 H1260 L1255 543 L1250 534 H1244 C1241 537 1239 540 1235 540 C1231 540 1228 536 1229 527 C1230 518 1235 512 1236 512 Z" fill="#FFC94D"></path>
+<path d="M1162 560 H1338" stroke="#323C4E" stroke-width="6" stroke-linecap="round"></path>
+<path d="M1190 482 C1150 380 1100 330 1060 320" stroke="#FFC94D" stroke-width="4" stroke-dasharray="4 14" stroke-linecap="round" fill="none"></path>
+<path d="M1218 452 C1226 444 1238 444 1246 452 M1208 440 C1222 426 1242 426 1256 440" stroke="#FFC94D" stroke-width="5" stroke-linecap="round" fill="none"></path>
+<path d="M120 900 V780 C120 740 150 712 190 712 H1250 C1290 712 1320 740 1320 780 V900 Z" fill="#1E2633"></path>
+<path d="M120 780 C120 740 150 712 190 712 H1250 C1290 712 1320 740 1320 780" stroke="#2C3747" stroke-width="6" fill="none"></path>
+<path d="M560 900 C560 800 600 744 720 744 C840 744 880 800 880 900 Z" fill="#0A0D12"></path>
+<path d="M608 770 C640 752 680 746 720 746 C760 746 800 752 832 770" stroke="#FF9E5E" stroke-width="4" opacity="0.5" fill="none" stroke-linecap="round"></path>
+<rect x="696" y="690" width="48" height="60" rx="18" fill="#0A0D12"></rect>
+<ellipse cx="720" cy="650" rx="62" ry="70" fill="#0A0D12"></ellipse>
+<path d="M664 620 C676 586 700 576 720 576 C740 576 764 586 776 620" stroke="#FF9E5E" stroke-width="4" opacity="0.55" fill="none" stroke-linecap="round"></path>
+<path d="M650 652 C650 600 682 566 720 566 C758 566 790 600 790 652" stroke="#2A3242" stroke-width="12" fill="none" stroke-linecap="round"></path>
+<rect x="636" y="632" width="22" height="46" rx="10" fill="#2A3242"></rect>
+<rect x="782" y="632" width="22" height="46" rx="10" fill="#2A3242"></rect>
+<path d="M560 840 C520 820 520 790 560 780" stroke="#0A0D12" stroke-width="34" stroke-linecap="round" fill="none"></path>
+<path d="M880 840 C920 820 920 790 880 780" stroke="#0A0D12" stroke-width="34" stroke-linecap="round" fill="none"></path>
+</svg></div>
+<figcaption style="color: #A6ADBB; font-size: 15px; text-align: center">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، واللابتوب يقرأ الحوار ويرسل الترجمة العربية للتلفزيون عبر الواي فاي. (رسمة توضيحية)</figcaption>
 </figure>
 </section>
 
