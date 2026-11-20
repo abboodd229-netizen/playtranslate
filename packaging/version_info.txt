@@ -3,7 +3,8 @@ VSVersionInfo(
                     fileType=0x1, subtype=0x0, date=(0, 0)),
   kids=[
     StringFileInfo([StringTable('040904B0', [
-      StringStruct('CompanyName', 'PlayTranslate'),
+      StringStruct('CompanyName', 'Abdullah Alghazwani'),
+      StringStruct('LegalCopyright', '© 2026 Abdullah Alghazwani. MIT License.'),
       StringStruct('FileDescription', 'PlayTranslate - Arabic game subtitles'),
       StringStruct('FileVersion', '0.2.2'),
       StringStruct('InternalName', 'PlayTranslate'),

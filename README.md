@@ -49,6 +49,10 @@ self-tests the packaged exe on Windows).
 No console modification, no game-file changes, no DRM or HDCP bypass. Only the subtitle
 text is sent to DeepL; images never leave the laptop.
 
+## Author
+
+Idea and development: **Abdullah Alghazwani (عبدالله الغزواني)**. © 2026, released under the MIT License.
+
 ## Keeping one signature for the TV app (repository owner, once)
 
 Android only installs an update over the old app when both have the same signature.
