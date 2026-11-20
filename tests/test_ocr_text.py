@@ -76,3 +76,56 @@ def test_rapidocr_two_line_subtitle(rapid_engine):
     assert len(ev.rows) == 2
     assert len(segs) == 1
     assert similar(segs[0].text, "If we don't find the horses soon, we will never make it home.", 0.9), segs[0].text
+
+
+def test_garble_score_and_second_opinion():
+    import numpy as np
+
+    from playtranslate.ocr import SecondOpinion, garble_score
+    from playtranslate.ocr.base import OcrEngine, OcrLine
+
+    assert garble_score("Meet me at the marina in Vice City.") == 0
+    assert garble_score("We got 2nd place, 100% sure.") == 0
+    assert garble_score("Me|et m3e at th~e mAri") > 0.5
+
+    class Fixed(OcrEngine):
+        def __init__(self, text):
+            self.name, self.text = "fixed", text
+
+        def recognize(self, image, rows=None):
+            return [OcrLine(self.text, (0, 0, 10, 10), 1.0)]
+
+        def warm_up(self):
+            pass
+
+    eng = SecondOpinion(Fixed("Me|et m3e at th~e mAri"), "rapid")
+    eng._secondary = Fixed("Meet me at the marina")
+    seen = []
+    eng.on_doubt = lambda img, a, b: seen.append((a[0].text, b[0].text))
+    out = eng.recognize(np.zeros((10, 10, 3), np.uint8))
+    assert out[0].text == "Meet me at the marina" and seen
+    clean = SecondOpinion(Fixed("All good here."), "rapid")
+    assert clean.recognize(np.zeros((10, 10, 3), np.uint8))[0].text == "All good here."
+
+
+def test_report_zip_hides_key(tmp_path, monkeypatch):
+    import json
+    import zipfile
+
+    import numpy as np
+
+    monkeypatch.setenv("PLAYTRANSLATE_HOME", str(tmp_path / "home"))
+    from playtranslate import report
+    from playtranslate.config import AppConfig
+    from playtranslate.ocr.base import OcrLine
+
+    report.save_case(np.zeros((20, 40, 3), np.uint8), [OcrLine("x|y", (0, 0, 1, 1), 0.4)], [], "GTA VI")
+    cfg = AppConfig()
+    cfg.deepl_api_key = "secret-key:fx"
+    cfg.normalize()
+    out = report.build_report(cfg, tmp_path)
+    with zipfile.ZipFile(out) as z:
+        names = z.namelist()
+        settings = json.loads(z.read("settings.json"))
+    assert any(n.endswith(".png") for n in names)
+    assert "secret" not in json.dumps(settings)

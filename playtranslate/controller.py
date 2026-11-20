@@ -14,6 +14,7 @@ from pathlib import Path
 from PySide6.QtCore import QObject, Signal
 
 from .capture import CaptureError, FrameSource, ImageFolderSource, VideoFileSource, WindowCapture
+from . import report
 from .config import AppConfig, data_dir, save_config
 from .detect import DetectorSettings
 from .ocr import OcrEngine
@@ -48,6 +49,9 @@ class Controller(QObject):
     running_changed = Signal(bool)
     engines_message = Signal(str, str)
     update_available = Signal(str, str)  # version, url
+    name_learned = Signal(str, str, str)  # profile, english, arabic
+    region_hint = Signal(str)  # side of the region where subtitles look cut off
+    packs_ready = Signal(list)  # [(profile, version, pack)] downloaded, waiting to be imported
 
     def __init__(self, cfg: AppConfig, source_spec: tuple[str, str] | None = None):
         super().__init__()
@@ -59,10 +63,58 @@ class Controller(QObject):
         self.server.on_translate_page = self.translate_page
         self.overlay_sink = QtSink()
         self.service = TranslationService(self.cache, self._build_engines(), cfg.active_profile,
-                                          cfg.profile.glossary, cfg.use_context)
+                                          cfg.profile.glossary, cfg.use_context, cfg.profile.auto_glossary)
+        self.service.on_name_learned = self._name_learned
         self.pipeline: Pipeline | None = None
         self._ocr: OcrEngine | None = None
         self.ocr_name = ""
+
+    def _name_learned(self, name: str, arabic: str) -> None:
+        # Worker thread: hand over to the GUI thread, which owns the config.
+        self.name_learned.emit(self.service.profile, name, arabic)
+
+    def grow_region(self, side: str) -> None:
+        """GUI thread: widen the subtitle area a little on a side where lines get cut off.
+
+        At most three steps per side each session, so a HUD element next to the
+        subtitles can never drag the area across the screen.
+        """
+        grown = getattr(self, "_region_grown", {})
+        if grown.get(side, 0) >= 3:
+            return
+        r = self.cfg.profile.region
+        step = 0.03
+        before = (r.x, r.y, r.w, r.h)
+        if side == "left" and r.x > 0:
+            d = min(step, r.x)
+            r.x -= d
+            r.w += d
+        elif side == "right":
+            r.w = min(r.w + step, 1.0 - r.x)
+        elif side == "top" and r.y > 0:
+            d = min(step, r.y)
+            r.y -= d
+            r.h += d
+        elif side == "bottom":
+            r.h = min(r.h + step, 1.0 - r.y)
+        r.normalize()
+        if (r.x, r.y, r.w, r.h) == before:
+            return
+        grown[side] = grown.get(side, 0) + 1
+        self._region_grown = grown
+        log.info("Region grown to the %s: %s", side, r)
+        if self.pipeline and hasattr(self.pipeline.source, "region"):
+            self.pipeline.source.region = r
+        self.status.emit("وسّعت منطقة الحوار شوي لأن الجملة كانت مقصوصة.", "info")
+        self.save()
+
+    def remember_name(self, profile_name: str, name: str, arabic: str) -> None:
+        """GUI thread: store a learned name in its game profile and save."""
+        profile = self.cfg.profiles.get(profile_name)
+        if profile is None or name in profile.glossary:
+            return
+        profile.auto_glossary[name] = arabic
+        self.save()
 
     def check_for_updates(self) -> None:
         """Look for a newer release in the background; emits update_available."""
@@ -70,11 +122,15 @@ class Controller(QObject):
             return
 
         def work():
+            from .packs import fetch_new_packs
             from .updates import check_latest
 
             found = check_latest()
             if found:
                 self.update_available.emit(*found)
+            packs = fetch_new_packs(self.cfg)
+            if packs:
+                self.packs_ready.emit(packs)
 
         threading.Thread(target=work, name="update-check", daemon=True).start()
 
@@ -184,6 +240,9 @@ class Controller(QObject):
         p.on_hide = self.hidden.emit
         p.on_geometry = self.geometry.emit
         p.on_stopped = self._on_stopped
+        p.on_region_hint = self.region_hint.emit
+        p.on_doubt = lambda image, first, second: report.save_case(image, first, second, self.cfg.active_profile)
+        self._region_grown: dict[str, int] = {}
         self.pipeline = p
         p.start()
         self.running_changed.emit(True)
@@ -224,7 +283,7 @@ class Controller(QObject):
         if glossary_changed:
             removed = self.cache.clear_machine(cfg.active_profile)
             log.info("Glossary changed; cleared %s cached lines", removed)
-        self.service.set_profile(cfg.active_profile, cfg.profile.glossary)
+        self.service.set_profile(cfg.active_profile, cfg.profile.glossary, cfg.profile.auto_glossary)
         self.service.use_context = cfg.use_context
         if engines_changed:
             self.service.set_engines(self._build_engines())

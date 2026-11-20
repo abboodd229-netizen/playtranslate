@@ -11,8 +11,8 @@ android {
         applicationId = "com.playtranslate.tv"
         minSdk = 26 // Android 8: TYPE_APPLICATION_OVERLAY
         targetSdk = 34
-        versionCode = 4
-        versionName = "0.2.2"
+        versionCode = 5
+        versionName = "0.3.0"
     }
 
     signingConfigs {

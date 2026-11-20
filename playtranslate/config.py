@@ -113,6 +113,8 @@ class GameProfile:
     split_speaker: bool = True
     # Minimum stroke contrast for text detection; lower finds faint text, higher ignores scenery.
     sensitivity: int = 55
+    # Names the app learned by itself (english -> arabic). The player's glossary wins over these.
+    auto_glossary: dict = field(default_factory=dict)
 
     def normalize(self) -> None:
         self.sensitivity = int(_clamp(self.sensitivity, 25, 140))
@@ -121,6 +123,11 @@ class GameProfile:
         self.glossary = {
             str(k).strip(): str(v).strip()
             for k, v in self.glossary.items()
+            if str(k).strip() and str(v).strip()
+        }
+        self.auto_glossary = {
+            str(k).strip(): str(v).strip()
+            for k, v in self.auto_glossary.items()
             if str(k).strip() and str(v).strip()
         }
         if not self.name.strip():
@@ -207,6 +214,8 @@ class AppConfig:
     check_updates: bool = True
     # Press «ابدأ» by itself when the app opens (it then waits for Remote Play).
     auto_start: bool = False
+    # Game packs already imported: profile name -> pack version.
+    pack_versions: dict = field(default_factory=dict)
     style: Style = field(default_factory=Style)
 
     def normalize(self) -> None:

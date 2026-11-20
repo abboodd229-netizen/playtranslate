@@ -92,6 +92,12 @@ class Pipeline:
         self.on_hide: Callable[[], None] = lambda: None
         self.on_geometry: Callable[[Frame], None] = lambda frame: None
         self.on_stopped: Callable[[str], None] = lambda reason: None
+        # Called with "left" | "right" | "top" | "bottom" when subtitles keep touching that
+        # edge of the region, i.e. they are probably cut off there.
+        self.on_region_hint: Callable[[str], None] = lambda side: None
+        self._edge_hits: dict[str, int] = {}
+        # Called (OCR thread) with the image and both readings when the main OCR was unsure.
+        self.on_doubt: Callable[[np.ndarray, list, list], None] = lambda image, first, second: None
 
     # ---- control -----------------------------------------------------
 
@@ -149,6 +155,8 @@ class Pipeline:
                     self.on_status(reason, "error")
                     return
                 self._ocr.warm_up()
+            if hasattr(self._ocr, "on_doubt"):
+                self._ocr.on_doubt = lambda image, first, second: self.on_doubt(image, first, second)
             self.source = self._source_factory()
             self.on_status(f"يعمل ({self._ocr.name})", "ok")
             self._loop()
@@ -207,6 +215,7 @@ class Pipeline:
 
             event = self._detector.feed(frame.crop)
             if isinstance(event, Stable):
+                self._check_edges(event, frame.crop.shape)
                 self._handle_stable(event, frame.timestamp)
             elif isinstance(event, Gone):
                 with self._display_lock:
@@ -219,6 +228,23 @@ class Pipeline:
 
             elapsed = time.perf_counter() - t0
             self._stop.wait(max(0.0, interval - elapsed))
+
+    def _check_edges(self, event: Stable, crop_shape: tuple[int, ...]) -> None:
+        x, y, w, h = event.bbox
+        H, W = crop_shape[:2]
+        margin = 3
+        touching = {
+            "left": x <= margin, "right": x + w >= W - margin,
+            "top": y <= margin, "bottom": y + h >= H - margin,
+        }
+        for side, hit in touching.items():
+            if not hit:
+                self._edge_hits[side] = 0
+                continue
+            self._edge_hits[side] = self._edge_hits.get(side, 0) + 1
+            if self._edge_hits[side] >= 3:
+                self._edge_hits[side] = 0
+                self.on_region_hint(side)
 
     def _handle_stable(self, event: Stable, frame_ts: float) -> None:
         t_ocr = time.perf_counter()

@@ -1,6 +1,6 @@
 [project]
 name = "playtranslate"
-version = "0.2.2"
+version = "0.3.0"
 authors = [{ name = "Abdullah Alghazwani" }]
 description = "Arabic subtitles for console games, shown on the TV"
 requires-python = ">=3.11"

@@ -16,6 +16,7 @@ from ..textproc import Segment, cache_key
 from .base import AuthError, EchoTranslator, QuotaExceeded, TranslationError, Translator
 from .cache import TranslationCache
 from .glossary import Glossary
+from .names import NameLearner
 
 log = logging.getLogger(__name__)
 
@@ -49,21 +50,34 @@ class TranslationResult:
 
 class TranslationService:
     def __init__(self, cache: TranslationCache, engines: list[Translator], profile: str = "",
-                 glossary: dict | None = None, use_context: bool = True):
+                 glossary: dict | None = None, use_context: bool = True, auto_glossary: dict | None = None):
         self.cache = cache
         self.engines = engines or [EchoTranslator()]
         self.profile = profile
-        self.glossary = Glossary(glossary)
         self.use_context = use_context
         self._recent: deque[str] = deque(maxlen=3)
         self._lock = threading.Lock()
         self.last_error = ""
+        # Called with (english_name, arabic_name) when a name is learned (from a worker thread).
+        self.on_name_learned = lambda name, arabic: None
+        self.learn_names = True
+        self._user_glossary: dict = {}
+        self._auto_glossary: dict = {}
+        self.names = NameLearner()
+        self.set_profile(profile, glossary or {}, auto_glossary or {})
 
-    def set_profile(self, profile: str, glossary: dict) -> None:
+    def set_profile(self, profile: str, glossary: dict, auto_glossary: dict | None = None) -> None:
         with self._lock:
+            changed_profile = profile != self.profile
             self.profile = profile
-            self.glossary = Glossary(glossary)
-            self._recent.clear()
+            self._user_glossary = dict(glossary)
+            if auto_glossary is not None:
+                self._auto_glossary = dict(auto_glossary)
+            # The player's own terms win over learned ones.
+            self.glossary = Glossary({**self._auto_glossary, **self._user_glossary})
+            if changed_profile:
+                self._recent.clear()
+            self.names.reset(set(self._user_glossary) | set(self._auto_glossary))
 
     def set_engines(self, engines: list[Translator]) -> None:
         with self._lock:
@@ -104,6 +118,11 @@ class TranslationService:
             for seg in segments:
                 self._recent.append(seg.text)
         self.last_error = error
+        if self.learn_names:
+            new_names = self.names.observe([s.text for s in segments])
+            if new_names:
+                threading.Thread(target=self._learn, args=(new_names, profile, engines),
+                                 name="learn-names", daemon=True).start()
         return TranslationResult([r for r in results if r is not None], (time.perf_counter() - start) * 1000, error)
 
     def _run_engines(self, engines: list[Translator], texts: list[str], glossary: Glossary,
@@ -124,6 +143,42 @@ class TranslationService:
                 errors.append(f"{engine.name}: {exc}")
         # Every engine failed: show the English so the player is not left with nothing.
         return list(texts), "", "؛ ".join(errors)
+
+    def _learn(self, names: list[str], profile: str, engines: list[Translator]) -> None:
+        """Translate new names on their own (one short request) and add them to the auto glossary."""
+        engine = next((e for e in engines if not isinstance(e, EchoTranslator)), None)
+        if engine is None:
+            return
+        try:
+            out = engine.translate(names, context="")
+        except Exception as exc:  # quota, network: try again next time the name shows up
+            log.info("Could not learn names %s: %s", names, exc)
+            with self._lock:
+                for n in names:
+                    self.names.known.discard(n.lower())
+            return
+        learned = {}
+        for name, arabic in zip(names, out):
+            arabic = arabic.strip().strip(".،")
+            # A name must come back as a short Arabic word or two, not a sentence or the English.
+            if not arabic or arabic.lower() == name.lower() or len(arabic.split()) > 3:
+                continue
+            if not any("\u0600" <= ch <= "\u06ff" for ch in arabic):
+                continue
+            learned[name] = arabic
+        if not learned:
+            return
+        with self._lock:
+            if profile != self.profile:
+                return
+            self._auto_glossary.update(learned)
+            self.glossary = Glossary({**self._auto_glossary, **self._user_glossary})
+        for name, arabic in learned.items():
+            log.info("Learned name %s -> %s", name, arabic)
+            try:
+                self.on_name_learned(name, arabic)
+            except Exception:
+                log.exception("on_name_learned failed")
 
     def correct(self, source: str, target: str) -> None:
         self.cache.correct(self.profile, cache_key(source), source, target.strip())

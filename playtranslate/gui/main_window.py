@@ -97,6 +97,9 @@ class MainWindow(QMainWindow):
         c.overlay_sink.hidden.connect(self.overlay.clear)
         self.deepl_result.connect(self._on_deepl_result)
         c.update_available.connect(self._on_update_available)
+        c.name_learned.connect(c.remember_name)
+        c.region_hint.connect(self._on_region_hint)
+        c.packs_ready.connect(self._on_packs)
 
         self._load_profile_into_ui()
         self._refresh_addresses()
@@ -301,11 +304,15 @@ class MainWindow(QMainWindow):
         row = QHBoxLayout()
         add = QPushButton("إضافة")
         add.clicked.connect(self._glossary_add)
+        export_btn = QPushButton("صدّر ذاكرة هذي اللعبة")
+        export_btn.setToolTip("ملف فيه الأسماء والجمل المترجمة، تشاركه مع أصحابك")
+        export_btn.clicked.connect(self._export_pack)
         rem = QPushButton("حذف المحدد")
         rem.clicked.connect(self._glossary_remove)
         row.addWidget(add)
         row.addWidget(rem)
         row.addStretch(1)
+        row.addWidget(export_btn)
         bv.addLayout(row)
         v.addWidget(box, 1)
         return w
@@ -382,6 +389,10 @@ class MainWindow(QMainWindow):
         open_btn = QPushButton("فتح مجلد البيانات والسجلات")
         open_btn.clicked.connect(self._open_data_dir)
         form.addRow(open_btn)
+        rep = QPushButton("سوّ تقرير لتحسين القراءة (يحفظ ملف على سطح المكتب)")
+        rep.setToolTip("يجمع الجمل اللي كان البرنامج غير متأكد منها مع السجل، بدون مفتاح DeepL. أرسل الملف للمطوّر.")
+        rep.clicked.connect(self._make_report)
+        form.addRow(rep)
         stats = QPushButton("عدد الجمل المحفوظة لهذه اللعبة")
         stats.clicked.connect(self._show_stats)
         form.addRow(stats)
@@ -631,6 +642,21 @@ class MainWindow(QMainWindow):
             self.c.service.correct(src, tgt)
         self._on_status("حُفظ التصحيح. سيُستخدم في كل مرة تظهر هذه الجملة.", "ok")
 
+    def _make_report(self):
+        from .. import report
+
+        try:
+            path = report.build_report(self.cfg)
+        except OSError as exc:
+            QMessageBox.warning(self, "التقرير", f"ما قدرت أسوي التقرير: {exc}")
+            return
+        n = report.case_count()
+        QMessageBox.information(self, "التقرير", f"جهز التقرير ({n} حالة صعبة):\n{path}\n\nأرسله للمطوّر عشان يضبط القراءة على لعبتك.")
+        if sys.platform == "win32":
+            import subprocess
+
+            subprocess.Popen(["explorer", "/select,", str(path)])  # noqa: S603,S607 - show our own file
+
     def _open_data_dir(self):
         path = str(data_dir())
         if sys.platform == "win32":
@@ -650,6 +676,31 @@ class MainWindow(QMainWindow):
         self.status_label.setText(text)
         self.status_label.setStyleSheet(
             f"padding: 6px; border-radius: 4px; background: #eceff1; color: {color}; font-weight: bold;")
+
+    def _on_packs(self, found: list):
+        from .. import packs as packs_mod
+
+        packs = packs_mod.apply_new_packs(found, self.cfg, self.c.cache)
+        if not packs:
+            return
+        self.c.apply(glossary_changed=False)  # push imported names to the translator and save
+        parts = [f"{p}: {lines} جملة و{names} اسم" for p, lines, names in packs]
+        self._on_status("نزّلت ذاكرة جاهزة (" + "، ".join(parts) + ")", "ok")
+
+    def _export_pack(self):
+        from .. import packs
+
+        try:
+            path = packs.export_pack(self.cfg, self.c.cache)
+        except OSError as exc:
+            QMessageBox.warning(self, "تصدير", f"ما قدرت أصدّر: {exc}")
+            return
+        QMessageBox.information(self, "تصدير", f"حفظت ذاكرة «{self.cfg.active_profile}» في:\n{path}\n\n"
+                                "أرسلها لأصحابك أو للمطوّر عشان تنضاف للباقة الجاهزة.")
+
+    def _on_region_hint(self, side: str):
+        self.c.grow_region(side)
+        self._load_profile_into_ui()  # refresh the region text in its tab
 
     def _toggle_login(self, on: bool):
         if not winapi.set_run_at_login(on):

@@ -99,6 +99,27 @@ class TranslationCache:
             c = self._db.execute("SELECT COUNT(*) FROM corrections WHERE profile=?", (profile,)).fetchone()[0]
         return {"translations": t, "corrections": c}
 
+    def import_many(self, profile: str, rows: list[tuple[str, str, str]], engine: str = "pack") -> int:
+        """Add (key, source, target) rows that are not cached yet. Never overwrites anything."""
+        now = time.time()
+        with self._lock:
+            before = self._db.total_changes
+            self._db.executemany(
+                "INSERT OR IGNORE INTO translations (profile, key, source, target, engine, created, hits)"
+                " VALUES (?, ?, ?, ?, ?, ?, 0)",
+                [(profile, k, s, t, engine, now) for k, s, t in rows],
+            )
+            return self._db.total_changes - before
+
+    def export(self, profile: str) -> dict[str, str]:
+        """source -> target for a game, with the player's corrections winning."""
+        with self._lock:
+            out = dict(self._db.execute(
+                "SELECT source, target FROM translations WHERE profile=? ORDER BY hits DESC", (profile,)).fetchall())
+            out.update(dict(self._db.execute(
+                "SELECT source, target FROM corrections WHERE profile=?", (profile,)).fetchall()))
+        return out
+
     def close(self) -> None:
         with self._lock:
             self._db.close()
