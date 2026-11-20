@@ -1,5 +1,7 @@
 # PlayTranslate
 
+**دليل الاستخدام المصوّر:** https://abboodd229-netizen.github.io/playtranslate/
+
 Arabic subtitles for console games, drawn over the game on the TV.
 
 The PS5 plays on the TV directly (no added input lag). A Windows laptop watches the

@@ -1,0 +1,569 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دليل PlayTranslate</title>
+<meta name="description" content="دليل تثبيت واستخدام PlayTranslate: ترجمة حوارات ألعاب البلايستيشن للعربي على التلفزيون.">
+<meta name="theme-color" content="#0F1115">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;700&amp;family=Noto+Naskh+Arabic:wght@500;700&amp;family=Readex+Pro:wght@500;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0F1115}
+a{color:#FFC94D}a:hover{color:#FFE09A}
+.wrap{max-width:1120px;margin:0 auto;padding:0 32px}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.flow{display:flex;align-items:stretch;gap:12px}
+.flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 28px}
+.toc{display:flex;flex-wrap:wrap;gap:10px}
+.shot img{display:block;width:100%;height:auto}
+.tv{container-type:inline-size}
+.tv-sub{font-size:3.1cqw}
+.trow{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:24px;padding:18px 24px;border-top:1px solid #262B36}
+code{font-family:ui-monospace,Consolas,monospace;direction:ltr;unicode-bidi:isolate;background:#232836;color:#FFE09A;padding:2px 7px;border-radius:6px;font-size:0.92em}
+@media (max-width:820px){
+.wrap{padding:0 16px}
+.grid2,.grid3{grid-template-columns:minmax(0,1fr)}
+.flow{flex-direction:column}
+.flow-arrow{flex-basis:24px}
+.flow-arrow svg{transform:rotate(-90deg)}
+.trow{grid-template-columns:minmax(0,1fr);gap:6px}
+.hero-title{font-size:40px !important}
+.step-title{font-size:26px !important}
+}
+</style>
+
+</head>
+<body>
+
+<div style="font-family: 'IBM Plex Sans Arabic', 'Segoe UI', Tahoma, sans-serif; color: #ECEEF2; background: #0F1115; font-size: 17px; line-height: 1.8; padding-bottom: 96px">
+
+<!-- ============ HERO ============ -->
+<header style="border-bottom: 1px solid #262B36; background: #13161C">
+<div class="wrap" style="padding-top: 72px; padding-bottom: 64px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: center; gap: 12px; color: #A6ADBB; font-size: 15px">
+<span style="display: inline-flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 10px; background: #FFC94D; color: #14161B; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 18px">ع</span>
+<span>PlayTranslate · الإصدار 0.3.0 · فكرة وتطوير عبدالله الغزواني</span>
+</div>
+<h1 class="hero-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 60px; line-height: 1.25; max-width: 900px">العب بالإنجليزي، واقرأ الحوار <span style="color: #FFC94D">بالعربي على التلفزيون</span></h1>
+<p style="margin: 0; max-width: 760px; font-size: 20px; color: #C9CED8">برنامج مجاني يقرأ ترجمة الحوار الإنجليزية من ألعاب البلايستيشن، ويترجمها للعربي، ويعرضها فوق اللعبة على شاشة التلفزيون. تلعب على التلفزيون مثل العادة، بدون أي قطعة إضافية وبدون أي تأخير في اللعب.</p>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; margin-top: 8px">
+<a href="https://github.com/abboodd229-netizen/playtranslate/releases/latest/download/PlayTranslate-windows.zip" style="display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 12px; background: #FFC94D; color: #14161B; font-weight: 700; text-decoration: none">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 20h16"></path></svg>
+برنامج اللابتوب (ويندوز)</a>
+<a href="https://github.com/abboodd229-netizen/playtranslate/releases/latest/download/PlayTranslateTV.apk" style="display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 12px; border: 1.5px solid #3A4152; color: #ECEEF2; font-weight: 500; text-decoration: none">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="12" rx="2"></rect><path d="M8 21h8"></path><path d="M12 17v4"></path></svg>
+تطبيق التلفزيون (APK)</a>
+<a href="https://github.com/abboodd229-netizen/playtranslate/releases/latest" style="display: inline-flex; align-items: center; min-height: 52px; padding: 0 10px; color: #A6ADBB; font-size: 15px">صفحة الإصدار كاملة</a>
+</div>
+<p style="margin: 0; font-size: 14px; color: #8C94A4">ملف ويندوز يحتوي تطبيق التلفزيون ونسخة من هذا الدليل، فتكفيك الضغطة الأولى. يشتغل على ويندوز 10 (إصدار 1809 أو أحدث) وويندوز 11.</p>
+</div>
+</header>
+
+<!-- ============ TV PREVIEW ============ -->
+<section class="wrap" style="padding-top: 64px">
+<figure style="margin: 0; display: flex; flex-direction: column; gap: 14px">
+<div class="tv" style="background: #050608; border-radius: 22px; padding: 14px; border: 1px solid #262B36">
+<div style="position: relative; border-radius: 10px; overflow: hidden; aspect-ratio: 16 / 9">
+<img src="img/scene_clean.jpg" alt="مشهد من لعبة على التلفزيون" style="display: block; width: 100%; height: 100%; object-fit: cover">
+<div style="position: absolute; left: 0; right: 0; bottom: 14%; display: flex; justify-content: center">
+<p class="tv-sub" style="margin: 0; padding: 0.35em 0.8em; background: rgba(0,0,0,0.6); border-radius: 0.3em; font-family: 'Noto Naskh Arabic', serif; font-weight: 700; color: #FFFFFF; line-height: 1.5; text-shadow: 0 0 3px #000, 0 0 3px #000"><span style="color: #FFD54F">آرثر:</span> يجب أن نغادر البلدة قبل الفجر.</p>
+</div>
+</div>
+</div>
+<figcaption style="color: #A6ADBB; font-size: 15px; text-align: center">هذا اللي بتشوفه على التلفزيون: الترجمة العربية فوق صورة اللعبة، واسم المتكلم بلون مختلف. (صورة توضيحية)</figcaption>
+</figure>
+</section>
+
+<!-- ============ TOC ============ -->
+<nav class="wrap" aria-label="محتويات الدليل" style="padding-top: 48px">
+<div class="toc">
+<a href="#how" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">كيف يشتغل</a>
+<a href="#need" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">وش تحتاج</a>
+<a href="#s1" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">١. برنامج اللابتوب</a>
+<a href="#s2" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٢. تطبيق التلفزيون</a>
+<a href="#s3" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٣. PS Remote Play</a>
+<a href="#s4" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٤. مفتاح DeepL</a>
+<a href="#s5" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٥. تجهيز اللعبة (GTA 6 جاهزة)</a>
+<a href="#s6" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٦. ابدأ والعب</a>
+<a href="#page" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">ترجمة الشاشة كاملة</a>
+<a href="#learn" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">يتعلّم بنفسه</a>
+<a href="#tips" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">نصائح</a>
+<a href="#fix" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">حل المشاكل</a>
+</div>
+</nav>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how" class="wrap" style="padding-top: 88px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 15px">الفكرة</p>
+<h2 style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 38px; line-height: 1.35">كيف يشتغل النظام</h2>
+<p style="margin: 0; max-width: 780px; color: #C9CED8">البلايستيشن موصول بالتلفزيون بكيبل HDMI مثل العادة، فاللعب نفسه ما يتأثر أبدًا. اللابتوب يتفرج على نفس اللعبة من بعيد عن طريق PS Remote Play، ويقرأ سطر الترجمة، ويرسل العربي للتلفزيون عبر الواي فاي.</p>
+</div>
+<div class="flow">
+<div style="flex: 1 1 0; min-width: 0; background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFC94D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h4M8 9v4"></path><circle cx="15.5" cy="10.5" r="0.6" fill="#FFC94D"></circle><circle cx="17.5" cy="12.5" r="0.6" fill="#FFC94D"></circle><path d="M7 6h10a4 4 0 0 1 4 4l-1 6a2.5 2.5 0 0 1-4.5 1L14 15h-4l-1.5 2A2.5 2.5 0 0 1 4 16l-1-6a4 4 0 0 1 4-4z"></path></svg>
+<h3 style="margin: 0; font-size: 18px">البلايستيشن</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">تلعب بحسابك الأساسي على التلفزيون.</p>
+</div>
+<div class="flow-arrow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5B6377" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></div>
+<div style="flex: 1 1 0; min-width: 0; background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFC94D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="11" rx="1.5"></rect><path d="M2 19h20"></path></svg>
+<h3 style="margin: 0; font-size: 18px">Remote Play على اللابتوب</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">بحساب ثانوي، يعرض نفس الشاشة على اللابتوب.</p>
+</div>
+<div class="flow-arrow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5B6377" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></div>
+<div style="flex: 1 1 0; min-width: 0; background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFC94D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V5h3M17 5h3v3M20 16v3h-3M7 19H4v-3"></path><path d="M8 12h8"></path></svg>
+<h3 style="margin: 0; font-size: 18px">قراءة الترجمة</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">يقرأ السطر الإنجليزي فقط لما يكتمل، خلال أجزاء من الثانية.</p>
+</div>
+<div class="flow-arrow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5B6377" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></div>
+<div style="flex: 1 1 0; min-width: 0; background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFC94D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5h8M8 3v2M6 5c0 4 2 7 5 8M10 5c0 3-2 6-6 8"></path><path d="M13 21l4-9 4 9M14.5 18h5"></path></svg>
+<h3 style="margin: 0; font-size: 18px">الترجمة للعربي</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">عن طريق DeepL، وكل جملة تنحفظ عشان ما تنترجم مرتين.</p>
+</div>
+<div class="flow-arrow"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5B6377" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></div>
+<div style="flex: 1 1 0; min-width: 0; background: #1E1B12; border: 1px solid #5A4A1E; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#FFC94D" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="1.5"></rect><path d="M7 13h10"></path><path d="M9 20h6"></path></svg>
+<h3 style="margin: 0; font-size: 18px">التلفزيون</h3>
+<p style="margin: 0; color: #D8CFB5; font-size: 15px; line-height: 1.7">تطبيق صغير يرسم العربي فوق صورة البلايستيشن.</p>
+</div>
+</div>
+<div style="display: flex; gap: 14px; align-items: flex-start; background: #14201F; border: 1px solid #24403D; border-radius: 14px; padding: 18px 22px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ED3C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 22px; margin-top: 4px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+<p style="margin: 0; color: #CFE7E4">التأخير يكون في ظهور الترجمة فقط، وعادة أقل من ثانية بعد ما تكتمل الجملة. الجمل اللي انترجمت قبل تطلع فورًا. اللعب نفسه ما فيه أي تأخير لأن الصورة توصل التلفزيون من البلايستيشن مباشرة.</p>
+</div>
+</section>
+
+<!-- ============ WHAT YOU NEED ============ -->
+<section id="need" class="wrap" style="padding-top: 88px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 15px">قبل ما تبدأ</p>
+<h2 style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 38px; line-height: 1.35">وش تحتاج</h2>
+</div>
+<div class="grid3">
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">لابتوب أو كمبيوتر ويندوز</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">ويندوز 10 أو 11. أي معالج حديث يكفي، وما يحتاج كرت شاشة قوي.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">تلفزيون Google TV أو Android TV</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">مثل سوني و TCL وهايسنس وشاومي. تلفزيونات LG وسامسونج ما تدعم تطبيقات أندرويد، وفيه حل بديل لها تحت.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">PS5 أو PS4</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">موصول بالتلفزيون مثل العادة. الأفضل يكون موصول بالراوتر بكيبل إنترنت.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">حساب PSN ثانوي</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">مجاني. اللابتوب يدخل فيه عشان يتفرج على الشاشة وأنت تلعب بحسابك.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">مفتاح DeepL مجاني</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">500 ألف حرف كل شهر، وهذا يكفي اللعب العادي بسهولة.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">نفس الشبكة</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">اللابتوب والتلفزيون والبلايستيشن كلهم على نفس الراوتر.</p>
+</div>
+</div>
+</section>
+
+<!-- ============ STEP 1 ============ -->
+<section id="s1" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: center; gap: 18px">
+<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">١</span>
+<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">ثبّت برنامج اللابتوب</h2>
+</div>
+<div class="grid2">
+<ol style="margin: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 14px">
+<li>نزّل <a href="https://github.com/abboodd229-netizen/playtranslate/releases/latest/download/PlayTranslate-windows.zip">ملف ويندوز</a> وفك ضغطه في أي مجلد، مثلًا <code>C:\PlayTranslate</code>.</li>
+<li>افتح المجلد وشغّل <code>PlayTranslate.exe</code>.</li>
+<li>لو طلعت رسالة زرقاء «Windows protected your PC»، اضغط <b>More info</b> ثم <b>Run anyway</b>. هذا طبيعي لأن البرنامج مجاني وغير موقّع رقميًا. لا تطفي أي حماية في جهازك.</li>
+<li>أول مرة يسألك جدار الحماية: اختر <b>السماح على الشبكات الخاصة (Private)</b>. بدون هذا التلفزيون ما يقدر يتصل باللابتوب.</li>
+</ol>
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 12px">
+<p style="margin: 0; font-weight: 700">رسالة ويندوز الزرقاء: وش تضغط</p>
+<div style="background: #0B5CAD; border-radius: 10px; padding: 20px; color: #FFFFFF; font-family: 'Segoe UI', sans-serif; direction: ltr; text-align: left; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-size: 22px; font-weight: 600">Windows protected your PC</p>
+<p style="margin: 0; font-size: 14px; opacity: 0.9">Microsoft Defender SmartScreen prevented an unrecognized app from starting…</p>
+<p style="margin: 0; font-size: 14px"><span style="text-decoration: underline; outline: 2px solid #FFC94D; outline-offset: 3px; border-radius: 2px">More info</span></p>
+<div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 6px">
+<span style="padding: 6px 18px; border: 2px solid #FFC94D; border-radius: 2px; font-size: 14px">Run anyway</span>
+<span style="padding: 6px 18px; border: 1px solid rgba(255,255,255,0.6); border-radius: 2px; font-size: 14px">Don't run</span>
+</div>
+</div>
+<p style="margin: 0; color: #A6ADBB; font-size: 14px">زر <b>Run anyway</b> يظهر بعد ما تضغط More info.</p>
+</div>
+<div style="display: flex; gap: 12px; align-items: flex-start; background: #14201F; border: 1px solid #24403D; border-radius: 14px; padding: 16px 20px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ED3C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 20px; margin-top: 5px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+<p style="margin: 0; color: #CFE7E4; font-size: 15px">ما تحتاج تثبّت Python أو أي شيء ثاني. كل اللي يحتاجه البرنامج موجود داخل المجلد.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ============ STEP 2 ============ -->
+<section id="s2" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: center; gap: 18px">
+<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٢</span>
+<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">ثبّت تطبيق التلفزيون</h2>
+</div>
+<p style="margin: 0; max-width: 820px; color: #C9CED8">التلفزيون ينزّل تطبيقه من اللابتوب نفسه، فما تحتاج فلاشة ولا كمبيوتر ثاني. خلّ برنامج اللابتوب شغّال وأنت تسوي هذي الخطوة.</p>
+<div class="grid2">
+<ol style="margin: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 14px">
+<li>في التلفزيون افتح متجر Google Play وثبّت تطبيق <b>Downloader</b> (مجاني).</li>
+<li>في التلفزيون: <b>الإعدادات ← التطبيقات ← الأمان</b>، واسمح لتطبيق Downloader بتثبيت التطبيقات. اسم القائمة يختلف شوي حسب نوع التلفزيون.</li>
+<li>في برنامج اللابتوب، تبويب <b>التشغيل</b>، تلقى سطر فيه عنوان مثل <code>http://192.168.1.20:8765/tv.apk</code> (الأرقام تختلف عندك).</li>
+<li>اكتب هذا العنوان في Downloader، وبينزل التطبيق ويثبّته.</li>
+<li>افتح <b>PlayTranslate</b> في التلفزيون، واضغط «منح صلاحية العرض فوق التطبيقات» وفعّلها.</li>
+<li>اضغط «عرض نص تجربة»، وبسرعة غيّر لمدخل HDMI حق البلايستيشن.</li>
+</ol>
+<figure class="shot" style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="border-radius: 12px; overflow: hidden; border: 1px solid #2E3442; position: relative">
+<img src="img/gui_run.png" alt="تبويب التشغيل في برنامج اللابتوب">
+<div style="position: absolute; left: 2.5%; right: 2.5%; top: 55.6%; height: 3.8%; border: 3px solid #FFC94D; border-radius: 6px"></div>
+</div>
+<figcaption style="color: #A6ADBB; font-size: 14px">تبويب التشغيل. المستطيل الأصفر هو العنوان اللي تكتبه في Downloader.</figcaption>
+</figure>
+</div>
+<div style="display: flex; gap: 14px; align-items: flex-start; background: #1E1B12; border: 1px solid #5A4A1E; border-radius: 14px; padding: 18px 22px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFC94D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 22px; margin-top: 4px"><path d="M12 3l9 16H3z"></path><path d="M12 10v4M12 17h.01"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; font-weight: 700; color: #FFE09A">أهم خطوة في الدليل كله</p>
+<p style="margin: 0; color: #E3DAC0">لو شفت نص التجربة فوق صورة البلايستيشن، فتلفزيونك يدعم النظام وكل شيء جاهز. لو ما ظهر، روح لقسم «<a href="#fallback">لو تلفزيونك ما يعرض فوق اللعبة</a>».</p>
+</div>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 8px">
+<p style="margin: 0; font-weight: 700">لو صفحة الصلاحية ما فتحت</p>
+<p style="margin: 0; color: #C9CED8; font-size: 16px">في التلفزيون: <b>الإعدادات ← التطبيقات ← وصول خاص للتطبيقات ← العرض فوق التطبيقات الأخرى</b>، وفعّل PlayTranslate.</p>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px">بعدها التطبيق يشتغل بنفسه كل ما تشغّل التلفزيون، ويلقى اللابتوب تلقائيًا بدون ما تكتب أي عنوان.</p>
+</div>
+</section>
+
+<!-- ============ STEP 3 ============ -->
+<section id="s3" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: center; gap: 18px">
+<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٣</span>
+<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">جهّز PS Remote Play على اللابتوب</h2>
+</div>
+<div class="grid2">
+<ol style="margin: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 14px">
+<li>نزّل <b>PS Remote Play</b> للكمبيوتر من <a href="https://remoteplay.dl.playstation.net/remoteplay/">موقع بلايستيشن الرسمي</a>.</li>
+<li>في البلايستيشن نفسه: <b>الإعدادات ← النظام ← التشغيل عن بُعد</b> وفعّل «تمكين التشغيل عن بُعد». ومن <b>الإعدادات ← النظام ← توفير الطاقة ← الميزات المتاحة في وضع الراحة</b> فعّل «البقاء متصلاً بالإنترنت» و«تمكين تشغيل PS5 من الشبكة».</li>
+<li>سوّ حساب PSN ثانوي مجاني من موقع بلايستيشن، وأضفه كمستخدم في البلايستيشن وسجّل دخوله مرة وحدة.</li>
+<li>في Remote Play على اللابتوب سجّل دخول بالحساب <b>الثانوي</b>، واتصل بالبلايستيشن.</li>
+<li>من إعدادات Remote Play: الدقة <b>1080p</b> ومعدل الإطارات <b>مرتفع</b>. لو الشبكة ضعيفة استخدم 720p.</li>
+<li>خلّ نافذة Remote Play <b>ظاهرة</b> على شاشة اللابتوب بحجم 1280×720 أو أكبر. لا تصغّرها ولا تحط فوقها نوافذ ثانية.</li>
+</ol>
+<figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="background: #20242D; border-radius: 12px; border: 1px solid #2E3442; overflow: hidden">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; background: #2A2F3A; direction: ltr; font-family: 'Segoe UI', sans-serif; font-size: 13px; color: #C9CED8">
+<span>PS Remote Play</span>
+<span style="letter-spacing: 8px">– ☐ ✕</span>
+</div>
+<img src="img/scene_en.jpg" alt="نافذة Remote Play تعرض اللعبة مع الترجمة الإنجليزية" style="display: block; width: 100%; height: auto">
+</div>
+<figcaption style="color: #A6ADBB; font-size: 14px">نافذة Remote Play على اللابتوب. البرنامج يقرأ منها السطر الإنجليزي اللي تحت. (صورة توضيحية)</figcaption>
+</figure>
+</div>
+<div style="display: flex; gap: 14px; align-items: flex-start; background: #14201F; border: 1px solid #24403D; border-radius: 14px; padding: 18px 22px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ED3C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 22px; margin-top: 4px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+<p style="margin: 0; color: #CFE7E4">ليش حساب ثانوي؟ لأن Remote Play يدخل كمستخدم ثاني على نفس البلايستيشن، فتقدر تلعب بحسابك وجوائزك ومشترياتك مثل العادة.</p>
+</div>
+</section>
+
+<!-- ============ STEP 4 ============ -->
+<section id="s4" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: center; gap: 18px">
+<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٤</span>
+<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">ضيف مفتاح الترجمة المجاني</h2>
+</div>
+<div class="grid2">
+<ol style="margin: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 14px">
+<li>سجّل في <a href="https://www.deepl.com/pro-api">DeepL API Free</a>. ممكن يطلب بطاقة للتحقق فقط، وما يخصم شيء.</li>
+<li>من حسابك في DeepL انسخ المفتاح. المفتاح المجاني ينتهي بـ <code>:fx</code>.</li>
+<li>في برنامج اللابتوب افتح تبويب <b>الترجمة</b>، وخلّ المحرك <b>DeepL</b>، والصق المفتاح.</li>
+<li>اضغط <b>«اختبار المفتاح والرصيد»</b>. بيطلع لك كم حرف باقي لك هذا الشهر.</li>
+</ol>
+<figure class="shot" style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="border-radius: 12px; overflow: hidden; border: 1px solid #2E3442">
+<img src="img/gui_translate.png" alt="تبويب الترجمة: محرك DeepL ومكان المفتاح وقاموس المصطلحات">
+</div>
+<figcaption style="color: #A6ADBB; font-size: 14px">تبويب الترجمة. تحت المفتاح فيه قاموس للأسماء، نشرحه في النصائح.</figcaption>
+</figure>
+</div>
+<div style="display: flex; gap: 14px; align-items: flex-start; background: #14201F; border: 1px solid #24403D; border-radius: 14px; padding: 18px 22px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6ED3C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 22px; margin-top: 4px"><rect x="5" y="11" width="14" height="9" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+<p style="margin: 0; color: #CFE7E4">مفتاحك ينحفظ مشفّر بحساب ويندوز حقك، وما ينتقل لو نسخت مجلد البرنامج لأحد. كل شخص يحتاج مفتاحه الخاص.</p>
+</div>
+</section>
+
+<!-- ============ STEP 5 ============ -->
+<section id="s5" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: center; gap: 18px">
+<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٥</span>
+<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">جهّز اللعبة (مرة وحدة لكل لعبة)</h2>
+</div>
+<div class="grid3">
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 14px">أ</p>
+<h3 style="margin: 0; font-size: 18px">أنشئ ملف اللعبة</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">في تبويب التشغيل اضغط <b>«جديدة»</b> واكتب اسم اللعبة. كل لعبة لها منطقتها وقاموسها.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 14px">ب</p>
+<h3 style="margin: 0; font-size: 18px">شغّل الترجمة داخل اللعبة</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">من إعدادات اللعبة: Subtitles بالإنجليزي. كبّر حجمها، وشغّل خلفيتها لو فيه خيار. هذا يحسّن القراءة كثير.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 14px">ج</p>
+<h3 style="margin: 0; font-size: 18px">حدّد مكان الترجمة</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">انتظر لين تطلع جملة في اللعبة، ثم من تبويب <b>منطقة الحوار</b> اضغط «حدّد منطقة الحوار من الشاشة» واسحب مستطيل حولها.</p>
+</div>
+</div>
+<div style="display: flex; gap: 16px; align-items: flex-start; background: #1E1B12; border: 1px solid #5A4A1E; border-radius: 16px; padding: 22px 24px">
+<span style="flex: 0 0 auto; padding: 4px 12px; border-radius: 8px; background: #FFC94D; color: #14161B; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 15px; direction: ltr">GTA VI</span>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; font-weight: 700; color: #FFE09A">لعبة GTA 6 جاهزة في القائمة</p>
+<p style="margin: 0; color: #E3DAC0; font-size: 16px">اخترها من قائمة «اللعبة» في تبويب التشغيل وتتخطى الخطوة (أ). منطقتها مضبوطة على وسط أسفل الشاشة بعيد عن الخريطة الصغيرة اللي في الزاوية، وقاموسها فيه لوسيا وجيسون وفايس سيتي وليونيدا وباقي الأماكن الرئيسية. أول ما تطلع جملة في اللعبة، شيّك على «آخر ما قرأته الأداة». لو الترجمة مقصوصة، عدّل المنطقة مرة وحدة وخلاص.</p>
+</div>
+</div>
+<div class="grid2">
+<figure style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="position: relative; border-radius: 12px; overflow: hidden; border: 1px solid #2E3442">
+<img src="img/scene_en.jpg" alt="سحب مستطيل حول مكان الترجمة في الصورة" style="display: block; width: 100%; height: auto; filter: brightness(0.55)">
+<div style="position: absolute; left: 12%; right: 12%; top: 74%; height: 18%; border: 3px dashed #FFC94D; border-radius: 6px; background: rgba(255,201,77,0.10)"></div>
+<p style="position: absolute; right: 12%; top: calc(74% - 34px); margin: 0; padding: 2px 10px; background: #FFC94D; color: #14161B; border-radius: 6px; font-size: 14px; font-weight: 700">منطقة الحوار</p>
+</div>
+<figcaption style="color: #A6ADBB; font-size: 14px">اسحب المستطيل حول مكان الترجمة مع هامش بسيط فوق وتحت، عشان يشمل الجمل اللي تجي في سطرين.</figcaption>
+</figure>
+<figure class="shot" style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="border-radius: 12px; overflow: hidden; border: 1px solid #2E3442">
+<img src="img/gui_region.png" alt="تبويب منطقة الحوار مع صورة آخر ما قرأته الأداة">
+</div>
+<figcaption style="color: #A6ADBB; font-size: 14px">تحت «آخر ما قرأته الأداة» تشوف وش قرأ البرنامج بالضبط. لو الجملة واضحة فيها، فالمنطقة صحيحة.</figcaption>
+</figure>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; font-weight: 700">إعدادين في نفس التبويب، تحتاجها بس لو القراءة ما ضبطت</p>
+<p style="margin: 0; color: #C9CED8; font-size: 16px"><b>لون الترجمة في اللعبة:</b> «فاتح» لأغلب الألعاب (أبيض أو أصفر). لو ترجمة اللعبة غامقة على خلفية فاتحة اختر «غامق»، ولو مو متأكد اختر «تلقائي».</p>
+<p style="margin: 0; color: #C9CED8; font-size: 16px"><b>الحساسية:</b> حرّكها لليسار لو البرنامج ما يلقط الترجمة، ولليمين لو يقرأ أشياء من المشهد ما لها علاقة.</p>
+</div>
+</section>
+
+<!-- ============ STEP 6 ============ -->
+<section id="s6" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; align-items: center; gap: 18px">
+<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٦</span>
+<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">اضغط «ابدأ» وارجع للعب</h2>
+</div>
+<div class="grid2">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<p style="margin: 0; color: #C9CED8">في تبويب <b>التشغيل</b> اضغط الزر الكبير <b>ابدأ</b>. من هنا وطالع كل شيء تلقائي: كل ما طلعت جملة في اللعبة، تظهر بالعربي على التلفزيون، وتختفي لما تختفي الإنجليزية.</p>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="display: flex; gap: 12px; align-items: baseline"><span style="color: #FFC94D; font-weight: 700; flex: 0 0 auto">التلفزيون: متصل ✓</span><span style="color: #A6ADBB; font-size: 15px">يعني تطبيق التلفزيون شغّال ولقى اللابتوب.</span></div>
+<div style="display: flex; gap: 12px; align-items: baseline"><span style="color: #FFC94D; font-weight: 700; flex: 0 0 auto">آخر جملة</span><span style="color: #A6ADBB; font-size: 15px">الإنجليزي والعربي لآخر سطر، والوقت اللي أخذته القراءة والترجمة.</span></div>
+<div style="display: flex; gap: 12px; align-items: baseline"><span style="color: #FFC94D; font-weight: 700; flex: 0 0 auto">السجل</span><span style="color: #A6ADBB; font-size: 15px">كل الجمل اللي مرت. انقر مرتين على أي جملة لتصحيح ترجمتها.</span></div>
+<div style="display: flex; gap: 12px; align-items: baseline"><span style="color: #FFC94D; font-weight: 700; flex: 0 0 auto">إرسال نص تجربة</span><span style="color: #A6ADBB; font-size: 15px">يرسل جملة للتلفزيون عشان تتأكد من الاتصال والشكل.</span></div>
+</div>
+<div style="display: flex; gap: 14px; align-items: flex-start; background: #1E1B12; border: 1px solid #5A4A1E; border-radius: 14px; padding: 18px 22px">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFC94D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 22px; margin-top: 4px"><path d="M13 2L4 14h7l-1 8 9-12h-7z"></path></svg>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<p style="margin: 0; font-weight: 700; color: #FFE09A">المرة الجاية بدون ولا ضغطة</p>
+<p style="margin: 0; color: #E3DAC0; font-size: 16px">علّم على «ابدأ الترجمة تلقائيًا لما أفتح البرنامج» و«شغّل البرنامج مع ويندوز» تحت زر ترجمة الشاشة. بعدها تفتح اللابتوب وتشغّل PS Remote Play بس، والترجمة تبدأ بنفسها.</p>
+</div>
+</div>
+</div>
+<figure class="shot" style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="border-radius: 12px; overflow: hidden; border: 1px solid #2E3442">
+<img src="img/gui_run.png" alt="تبويب التشغيل والبرنامج يعمل والتلفزيون متصل">
+</div>
+<figcaption style="color: #A6ADBB; font-size: 14px">البرنامج يعمل، والتلفزيون متصل، وآخر جملة انترجمت في 195 جزء من الألف من الثانية.</figcaption>
+</figure>
+</div>
+</section>
+
+<!-- ============ WHOLE SCREEN ============ -->
+<section id="page" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 15px">جديد في 0.2.0</p>
+<h2 style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 38px; line-height: 1.35">ترجمة الشاشة كاملة من جوالك</h2>
+<p style="margin: 0; max-width: 820px; color: #C9CED8">الحوار يترجم نفسه تلقائيًا. لكن لما تفتح قائمة أو الخريطة أو صفحة مهمة أو رسالة على الشاشة، اضغط زر واحد وتطلع ترجمة كل اللي على الشاشة في وسط التلفزيون.</p>
+</div>
+<div class="grid2">
+<div style="display: flex; flex-direction: column; gap: 20px">
+<ol style="margin: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 14px">
+<li>في جوالك افتح العنوان المكتوب في تبويب التشغيل، مثل <code>http://192.168.1.20:8765/remote</code>. لازم الجوال على نفس الواي فاي.</li>
+<li>من قائمة المتصفح اختر <b>«إضافة إلى الشاشة الرئيسية»</b>، عشان يصير عندك مثل التطبيق.</li>
+<li>وأنت تلعب، افتح الصفحة اللي تبيها في اللعبة واضغط الزر الأصفر.</li>
+<li>الترجمة تظهر في وسط التلفزيون لمدة 12 ثانية، وبعدها ترجع ترجمة الحوار. اضغط الزر مرة ثانية لو تبي تخفيها بدري.</li>
+</ol>
+<div style="display: flex; gap: 12px; align-items: flex-start; background: #14201F; border: 1px solid #24403D; border-radius: 14px; padding: 16px 20px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ED3C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 20px; margin-top: 5px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
+<p style="margin: 0; color: #CFE7E4; font-size: 15px">نفس الزر موجود في تبويب التشغيل باللابتوب. القراءة هنا تاخذ ثانية أو ثانيتين لأنها تقرأ الشاشة كلها، مو سطر واحد.</p>
+</div>
+</div>
+<div style="display: flex; gap: 20px; align-items: flex-start">
+<figure style="margin: 0; flex: 0 0 38%; display: flex; flex-direction: column; gap: 10px">
+<div style="border-radius: 26px; overflow: hidden; border: 6px solid #2A2F3A; background: #0F1115">
+<img src="img/phone_remote.png" alt="صفحة الريموت في الجوال: زر ترجم الشاشة كاملة" style="display: block; width: 100%; height: auto">
+</div>
+<figcaption style="color: #A6ADBB; font-size: 14px">صفحة الريموت في الجوال.</figcaption>
+</figure>
+<figure class="tv" style="margin: 0; flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="background: #050608; border-radius: 14px; padding: 8px; border: 1px solid #262B36">
+<div style="position: relative; border-radius: 8px; overflow: hidden; aspect-ratio: 16 / 9">
+<img src="img/scene_clean.jpg" alt="التلفزيون يعرض ترجمة قائمة اللعبة في الوسط" style="display: block; width: 100%; height: 100%; object-fit: cover; filter: brightness(0.7)">
+<div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center">
+<p style="margin: 0; padding: 0.5em 1.1em; background: rgba(0,0,0,0.82); border-radius: 0.4em; font-family: 'Noto Naskh Arabic', serif; font-weight: 700; color: #FFFFFF; font-size: 3.6cqw; line-height: 1.6; text-align: center">متابعة اللعب<br>أهداف المهمة<br>الإعدادات<br>الخروج إلى القائمة الرئيسية</p>
+</div>
+</div>
+</div>
+<figcaption style="color: #A6ADBB; font-size: 14px">على التلفزيون: كل سطر مترجم لحاله بخط أصغر في الوسط. (صورة توضيحية)</figcaption>
+</figure>
+</div>
+</div>
+</section>
+
+<!-- ============ SELF LEARNING ============ -->
+<section id="learn" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 15px">جديد في 0.3.0</p>
+<h2 style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 38px; line-height: 1.35">البرنامج يتعلّم بنفسه وأنت تلعب</h2>
+<p style="margin: 0; max-width: 820px; color: #C9CED8">ما تحتاج تصحح ولا تضبط شيء وأنت تلعب. البرنامج يحسّن نفسه في الخلفية:</p>
+</div>
+<div class="grid3">
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">يحفظ الأسماء</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">أي اسم شخصية أو مكان يتكرر، يثبّت ترجمته من ثاني مرة يشوفه، فيطلع بنفس الشكل دائمًا.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">يضبط المنطقة</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">لو الجملة طلعت مقصوصة عند حافة منطقة الحوار أكثر من مرة، يوسّعها شوي لحاله.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">يتأكد من القراءة</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">لو سطر انقرا بشكل غريب، يعيد قراءته بالقارئ الثاني ويختار الأوضح.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">ذاكرة جاهزة لكل لعبة</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">أول ما تفتح البرنامج ينزّل باقة اللعبة (أسماء وجمل مترجمة) من صفحة المشروع، بدون ما يغيّر تصحيحاتك. باقة GTA VI جاهزة.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">تقرير بعد اللعب</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">اختياري: من تبويب «متقدم» زر «سوّ تقرير» يحفظ الجمل الصعبة في ملف على سطح المكتب. ترسله للمطوّر فتنضبط القراءة على لعبتك.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">شارك ذاكرتك</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">من تبويب «الترجمة» زر «صدّر ذاكرة هذي اللعبة» يحفظ ترجماتك وأسماءك في ملف تعطيه أصحابك.</p>
+</div>
+</div>
+</section>
+
+<!-- ============ TIPS ============ -->
+<section id="tips" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 15px">عشان تطلع الترجمة أحلى</p>
+<h2 style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 38px; line-height: 1.35">نصائح</h2>
+</div>
+<div class="grid2">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">قاموس الأسماء</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">في تبويب الترجمة أضف أسماء الشخصيات والأماكن بالعربي، مثل Arthur ← آرثر. تنطبق على كل الترجمات في هذي اللعبة.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">صحّح أي ترجمة</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">انقر مرتين على الجملة في السجل واكتب الترجمة الصحيحة. تصحيحك يُستخدم دائمًا لنفس الجملة.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">الذاكرة توفّر رصيدك</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">كل جملة تنترجم مرة وحدة وتنحفظ. إعادة المشهد ما تستهلك من رصيد DeepL، وتطلع فورًا.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">غيّر الشكل من اللابتوب</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">من تبويب الشكل تتحكم بحجم الخط ولونه ولون اسم المتكلم والخلفية والمكان. التغيير يظهر على التلفزيون مباشرة.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">التحديثات توصلك</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">لو نزلت نسخة جديدة يطلع سطر أصفر فوق في تبويب التشغيل فيه رابط التحميل. فك ضغطها مكان القديمة، وإعداداتك وقاموسك يظلون محفوظين.</p>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; padding: 22px; display: flex; flex-direction: column; gap: 6px">
+<h3 style="margin: 0; font-size: 18px">اللابتوب ما ينام</h3>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px; line-height: 1.7">طول ما البرنامج شغّال، ويندوز ما ينام ولا يطفي الشاشة حتى لو ما لمست اللابتوب. خلّه على الشاحن.</p>
+</div>
+</div>
+<figure class="shot" style="margin: 0; display: flex; flex-direction: column; gap: 10px">
+<div style="border-radius: 12px; overflow: hidden; border: 1px solid #2E3442">
+<img src="img/gui_style.png" alt="تبويب الشكل: حجم الخط والألوان والشفافية">
+</div>
+<figcaption style="color: #A6ADBB; font-size: 14px">تبويب الشكل. اضغط «إرسال نص تجربة لمدة 6 ثوانٍ» وشوف النتيجة على التلفزيون.</figcaption>
+</figure>
+</div>
+</section>
+
+<!-- ============ FALLBACK ============ -->
+<section id="fallback" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 20px">
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 20px; padding: 32px; display: flex; flex-direction: column; gap: 14px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 15px">حل بديل</p>
+<h2 style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 30px; line-height: 1.35">لو تلفزيونك ما يعرض فوق اللعبة (أو LG وسامسونج)</h2>
+<ol style="margin: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 10px; color: #C9CED8">
+<li>وصّل اللابتوب بالتلفزيون بكيبل HDMI.</li>
+<li>خلّ نافذة Remote Play ملء الشاشة.</li>
+<li>في تبويب التشغيل فعّل «فوق نافذة Remote Play على اللابتوب».</li>
+</ol>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px">هنا تلعب من Remote Play نفسه، فيصير فيه تأخير بسيط في اللعب. الترجمة تظهر فوق اللعبة بنفس الشكل، وما تظهر في تسجيل الشاشة.</p>
+</div>
+</section>
+
+<!-- ============ TROUBLESHOOTING ============ -->
+<section id="fix" class="wrap" style="padding-top: 88px; display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 15px">لو صار شيء</p>
+<h2 style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 38px; line-height: 1.35">حل المشاكل</h2>
+</div>
+<div style="background: #171A21; border: 1px solid #262B36; border-radius: 16px; overflow: hidden">
+<div class="trow" style="border-top: 0; background: #1B1F28; color: #A6ADBB; font-size: 14px; font-weight: 700"><span>المشكلة</span><span>الحل</span></div>
+<div class="trow"><span style="font-weight: 700">التلفزيون «يبحث عن اللابتوب» وما يتصل</span><span style="color: #C9CED8; font-size: 16px">تأكد إنهم على نفس الشبكة، وإنك وافقت على جدار الحماية (Private). أو اكتب عنوان اللابتوب يدويًا في تطبيق التلفزيون.</span></div>
+<div class="trow"><span style="font-weight: 700">Remote Play ما يلقى البلايستيشن</span><span style="color: #C9CED8; font-size: 16px">تأكد إن «تمكين التشغيل عن بُعد» مفعّل في البلايستيشن، وإنك سجّلت دخول الحساب الثانوي فيه مرة على الأقل، وإنهم على نفس الراوتر.</span></div>
+<div class="trow"><span style="font-weight: 700">شاشة Remote Play صارت سوداء في مشهد معيّن</span><span style="color: #C9CED8; font-size: 16px">طبيعي: بعض الألعاب تمنع البث في مشاهد محددة. الترجمة توقف في هذا المشهد بس وترجع بعده، وما يأثر على لعبك.</span></div>
+<div class="trow"><span style="font-weight: 700">«لم أجد نافذة PS Remote Play»</span><span style="color: #C9CED8; font-size: 16px">شغّل Remote Play واتصل بالبلايستيشن. لو اسم النافذة مختلف عندك عدّله من تبويب «متقدم».</span></div>
+<div class="trow"><span style="font-weight: 700">البرنامج ما يقرأ الترجمة</span><span style="color: #C9CED8; font-size: 16px">عدّل المنطقة، وجرّب «لون الترجمة»، وحرّك «الحساسية» لليسار. شوف صورة «آخر ما قرأته الأداة».</span></div>
+<div class="trow"><span style="font-weight: 700">يقرأ أشياء غلط من المشهد</span><span style="color: #C9CED8; font-size: 16px">صغّر المنطقة على مكان الترجمة بالضبط، وحرّك الحساسية لليمين، وشغّل خلفية الترجمة في اللعبة.</span></div>
+<div class="trow"><span style="font-weight: 700">محرك القراءة «RapidOCR» مو «Windows OCR»</span><span style="color: #C9CED8; font-size: 16px">طبيعي لو ويندوز عندك بالعربي فقط، ويشتغل ممتاز. لو تبي Windows OCR: الإعدادات ← الوقت واللغة ← إضافة لغة ← English (United States).</span></div>
+<div class="trow"><span style="font-weight: 700">«انتهى رصيد DeepL»</span><span style="color: #C9CED8; font-size: 16px">الجمل المحفوظة تستمر بالعربي. الجديدة تظهر بالإنجليزي لين يتجدد رصيدك أول الشهر.</span></div>
+<div class="trow"><span style="font-weight: 700">تحديث تطبيق التلفزيون ما يتثبت</span><span style="color: #C9CED8; font-size: 16px">لو عندك نسخة أقدم من 0.2.2، احذفها مرة وحدة وثبّت الجديدة. من 0.2.2 وطالع التحديثات تنزل فوق القديم مباشرة.</span></div>
+<div class="trow"><span style="font-weight: 700">أبي أتأكد إن القراءة تشتغل</span><span style="color: #C9CED8; font-size: 16px">من موجه الأوامر شغّل <code>PlayTranslate.exe --selftest</code>، والنتيجة تنحفظ في <code>%APPDATA%\PlayTranslate\selftest.txt</code>.</span></div>
+</div>
+<p style="margin: 0; color: #A6ADBB; font-size: 15px">الإعدادات والسجلات كلها في <code>%APPDATA%\PlayTranslate</code>، وتوصل لها بزر «فتح مجلد البيانات والسجلات» في تبويب متقدم.</p>
+</section>
+
+<!-- ============ SHARE ============ -->
+<section class="wrap" style="padding-top: 88px">
+<div style="background: #1E1B12; border: 1px solid #5A4A1E; border-radius: 20px; padding: 32px; display: flex; flex-wrap: wrap; gap: 24px; align-items: center; justify-content: space-between">
+<div style="flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 8px">
+<h2 style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 28px; line-height: 1.35">شاركه مع أصحابك</h2>
+<p style="margin: 0; color: #E3DAC0">أرسل لهم رابط هذا الدليل، أو رابط التحميل مباشرة. كل واحد يحتاج حساب PSN ثانوي ومفتاح DeepL خاص فيه.</p>
+</div>
+<a href="https://github.com/abboodd229-netizen/playtranslate/releases/latest/download/PlayTranslate-windows.zip" style="display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 12px; background: #FFC94D; color: #14161B; font-weight: 700; text-decoration: none">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 20h16"></path></svg>
+تحميل PlayTranslate</a>
+</div>
+<div style="margin-top: 48px; padding-top: 28px; border-top: 1px solid #262B36; display: flex; flex-direction: column; align-items: center; gap: 8px; text-align: center">
+<p style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 18px; color: #ECEEF2">فكرة وتطوير <span style="color: #FFC94D; font-weight: 700">عبدالله الغزواني</span></p>
+<p style="margin: 0; color: #A6ADBB; font-size: 14px">© 2026 عبدالله الغزواني <span dir="ltr">(Abdullah Alghazwani)</span>. جميع الحقوق محفوظة لاسم المشروع وهويته.</p>
+<p style="margin: 0; color: #A6ADBB; font-size: 14px">الكود منشور برخصة MIT: تقدر تستخدمه وتعدّله وتشاركه بشرط يبقى اسم صاحب الحقوق مذكور.</p>
+<p style="margin: 8px 0 0; color: #6F7787; font-size: 13px">PlayTranslate أداة مجانية للاستخدام الشخصي. ما تعدّل على البلايستيشن ولا على ملفات الألعاب. PlayStation و PS Remote Play علامات تجارية لأصحابها.</p>
+</div>
+</section>
+
+</div>
+
+</body>
+</html>
