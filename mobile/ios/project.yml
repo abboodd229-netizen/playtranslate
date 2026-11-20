@@ -129,6 +129,8 @@ targets:
     sources:
       - path: Tests
       - path: Shared
+      - path: ../../packs/gta-vi.json
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.playtranslate.mobile.tests
