@@ -18,7 +18,7 @@ special entitlement, so the beacon is sent as unicast to every address on the /2
 TV app's manual address field also works.
 
 Build: CI (`ios.yml`, macOS 26 runner) fetches and patches Pylux, builds the Chiaki C library for
-devices with `scripts/build-chiaki.sh` (cached per pinned commit), runs `xcodegen generate`, runs
+devices with `scripts/build-chiaki.sh`, runs `xcodegen generate`, runs
 the logic tests (shared code, no app host) on a simulator, makes an unsigned device build, then
 ad-hoc signs it to keep the App Group entitlement and zips `PlayTranslate.ipa`. Players sideload it for free with SideStore/AltStore
 (see `docs/INSTALL-ios-ar.md`). Pushing a tag `ios-vX.Y.Z` (or a manual run with `release_tag=ios-vX.Y.Z`) publishes a

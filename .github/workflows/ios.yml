@@ -41,25 +41,13 @@ jobs:
       - name: Fetch and patch the Remote Play code (Pylux, pinned)
         run: ./scripts/fetch-pylux.sh
 
-      - name: Restore the Remote Play library
-        id: chiaki-cache
-        uses: actions/cache@v4
-        with:
-          # version.h is generated into Pylux's source tree when the library is configured.
-          path: |
-            mobile/ios/third_party/pylux/ios/build-iphoneos
-            mobile/ios/third_party/pylux/lib/include/chiaki/version.h
-          key: chiaki-ios-macos26-v2-${{ hashFiles('mobile/ios/scripts/fetch-pylux.sh', 'mobile/ios/scripts/build-chiaki.sh') }}
-
       - name: Install the library's build tools
-        if: steps.chiaki-cache.outputs.cache-hit != 'true'
         run: |
           for i in 1 2 3; do brew install cmake ninja protobuf@29 python-setuptools && break; sleep $((i * 15)); done
           pip3 install --user --break-system-packages 'protobuf>=5,<6'
           echo "$(brew --prefix)/opt/protobuf@29/bin" >> "$GITHUB_PATH"
 
       - name: Build the Remote Play library (Chiaki, device)
-        if: steps.chiaki-cache.outputs.cache-hit != 'true'
         run: ./scripts/build-chiaki.sh
 
       - name: Generate the Xcode project
