@@ -205,6 +205,8 @@ class AppConfig:
     seen_presets: list = field(default_factory=list)
     # Look for a newer version on GitHub at start-up.
     check_updates: bool = True
+    # Press «ابدأ» by itself when the app opens (it then waits for Remote Play).
+    auto_start: bool = False
     style: Style = field(default_factory=Style)
 
     def normalize(self) -> None:

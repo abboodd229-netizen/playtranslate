@@ -213,3 +213,46 @@ def keep_awake(on: bool) -> bool:
         return bool(kernel32.SetThreadExecutionState(flags))
     except (AttributeError, OSError):
         return False
+
+
+RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+RUN_NAME = "PlayTranslate"
+
+
+def can_run_at_login() -> bool:
+    """Only the packaged exe has a stable path worth registering."""
+    return IS_WINDOWS and bool(getattr(sys, "frozen", False))
+
+
+def run_at_login() -> bool:
+    if not IS_WINDOWS:
+        return False
+    import winreg
+
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY) as key:
+            value, _ = winreg.QueryValueEx(key, RUN_NAME)
+        return bool(value)
+    except OSError:
+        return False
+
+
+def set_run_at_login(enabled: bool) -> bool:
+    """Start the app when the user signs in to Windows (per user, no admin needed)."""
+    if not can_run_at_login():
+        return False
+    import winreg
+
+    try:
+        with winreg.OpenKey(winreg.HKEY_CURRENT_USER, RUN_KEY, 0, winreg.KEY_SET_VALUE) as key:
+            if enabled:
+                winreg.SetValueEx(key, RUN_NAME, 0, winreg.REG_SZ, f'"{sys.executable}"')
+            else:
+                try:
+                    winreg.DeleteValue(key, RUN_NAME)
+                except FileNotFoundError:
+                    pass
+        return True
+    except OSError:
+        log.exception("Could not change the start-with-Windows setting")
+        return False

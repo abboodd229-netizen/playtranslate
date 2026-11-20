@@ -5,6 +5,6 @@ subtitle line, translates it, and sends the Arabic text to the TV app
 (or draws it locally over the Remote Play window).
 """
 
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 APP_NAME = "PlayTranslate"
 PROTOCOL_VERSION = 1

@@ -48,3 +48,12 @@ self-tests the packaged exe on Windows).
 
 No console modification, no game-file changes, no DRM or HDCP bypass. Only the subtitle
 text is sent to DeepL; images never leave the laptop.
+
+## Keeping one signature for the TV app (repository owner, once)
+
+Android only installs an update over the old app when both have the same signature.
+Add one repository secret named `PT_SIGNING_PASSWORD` (Settings → Secrets and variables →
+Actions → New repository secret) holding any long password (20+ characters). The next build
+on `main` makes a signing key, encrypts it with that password (AES-256, PBKDF2 600k) and commits
+only the encrypted file `tv-app/signing/release.jks.enc`. Every later build decrypts it.
+Keep the password somewhere safe: without it the key cannot be recovered.

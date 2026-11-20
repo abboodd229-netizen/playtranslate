@@ -19,8 +19,8 @@ jobs:
   test-linux:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -34,11 +34,12 @@ jobs:
   tv-apk:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
+          cache: gradle
       - name: Android SDK packages (the runner already has the SDK)
         run: |
           SDKMANAGER=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)
@@ -48,13 +49,38 @@ jobs:
         env:
           KEYSTORE_B64: ${{ secrets.PT_KEYSTORE_B64 }}
           KEYSTORE_PASSWORD: ${{ secrets.PT_KEYSTORE_PASSWORD }}
+          SIGNING_PASSWORD: ${{ secrets.PT_SIGNING_PASSWORD }}
+          CAN_PUSH: ${{ github.event_name != 'pull_request' && github.ref == 'refs/heads/main' }}
         run: |
-          # Optional secrets PT_KEYSTORE_B64 / PT_KEYSTORE_PASSWORD (alias "playtranslate") give every
-          # build the same signature, so new versions install over old ones. Without them a
-          # one-off key is made, and updating means uninstalling the old app first.
+          # The TV app must keep one signature so new versions install over old ones.
+          # Easiest setup: one repository secret PT_SIGNING_PASSWORD (any long password).
+          # The first build makes a key, encrypts it with that password and commits only the
+          # encrypted file (tv-app/signing/release.jks.enc); later builds decrypt it.
+          # Alternatively PT_KEYSTORE_B64 + PT_KEYSTORE_PASSWORD hold a key directly.
+          # With neither, a one-off key is made and updating means uninstalling first.
+          ENC=tv-app/signing/release.jks.enc
           if [ -n "$KEYSTORE_B64" ]; then
             echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/pt.jks"
             PW="$KEYSTORE_PASSWORD"
+          elif [ -n "$SIGNING_PASSWORD" ]; then
+            PW="$SIGNING_PASSWORD"
+            echo "::add-mask::$PW"
+            if [ -f "$ENC" ]; then
+              openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -in "$ENC" -out "$RUNNER_TEMP/pt.jks" -pass env:SIGNING_PASSWORD \
+                || { echo "::error::PT_SIGNING_PASSWORD does not open $ENC (password changed?)"; exit 1; }
+            else
+              keytool -genkeypair -keystore "$RUNNER_TEMP/pt.jks" -storetype PKCS12 -storepass "$PW" -keypass "$PW" \
+                -alias playtranslate -keyalg RSA -keysize 3072 -validity 10000 -dname "CN=PlayTranslate"
+              if [ "$CAN_PUSH" = "true" ]; then
+                mkdir -p tv-app/signing
+                openssl enc -aes-256-cbc -pbkdf2 -iter 600000 -salt -in "$RUNNER_TEMP/pt.jks" -out "$ENC" -pass env:SIGNING_PASSWORD
+                git config user.name "github-actions[bot]"
+                git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+                git add "$ENC"
+                git commit -m "TV app: store the encrypted signing key"
+                git push origin HEAD:main || echo "::warning::Could not save the signing key; the next build will make a new one."
+              fi
+            fi
           else
             PW=$(openssl rand -hex 16)
             keytool -genkeypair -keystore "$RUNNER_TEMP/pt.jks" -storepass "$PW" -keypass "$PW" \
@@ -73,7 +99,7 @@ jobs:
           chmod +x gradlew
           ./gradlew --no-daemon assembleRelease
           cp app/build/outputs/apk/release/app-release.apk ../PlayTranslateTV.apk
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: PlayTranslateTV-apk
           path: PlayTranslateTV.apk
@@ -82,8 +108,8 @@ jobs:
     needs: tv-apk
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -92,7 +118,7 @@ jobs:
         run: python -m pytest -q
         env:
           QT_QPA_PLATFORM: offscreen
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           name: PlayTranslateTV-apk
           path: playtranslate/server/static
@@ -112,7 +138,7 @@ jobs:
           Copy-Item docs\INSTALL-ar.md dist\PlayTranslate\
           Copy-Item playtranslate\server\static\PlayTranslateTV.apk dist\PlayTranslate\
           Compress-Archive -Path dist\PlayTranslate -DestinationPath PlayTranslate-windows.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: PlayTranslate-windows
           path: PlayTranslate-windows.zip

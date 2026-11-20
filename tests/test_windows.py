@@ -49,3 +49,12 @@ def test_keep_awake_request_and_release():
 
     assert keep_awake(True)
     assert keep_awake(False)
+
+
+def test_run_at_login_is_safe_when_not_packaged():
+    from playtranslate import winapi
+
+    # Tests run from source, so nothing is written to the registry.
+    assert not winapi.can_run_at_login()
+    assert winapi.set_run_at_login(True) is False
+    assert isinstance(winapi.run_at_login(), bool)

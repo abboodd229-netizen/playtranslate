@@ -16,7 +16,7 @@ from PySide6.QtWidgets import (
     QTableWidget, QTableWidgetItem, QTabWidget, QTextBrowser, QVBoxLayout, QWidget,
 )
 
-from .. import __version__
+from .. import __version__, winapi
 from ..capture import CaptureError
 from ..config import GameProfile, data_dir
 from ..controller import Controller
@@ -107,6 +107,8 @@ class MainWindow(QMainWindow):
         else:
             self._on_status("جاهز. شغّل PS Remote Play ثم اضغط «ابدأ».", "info")
         c.check_for_updates()
+        if self.cfg.auto_start and c.source_spec is None:
+            QTimer.singleShot(1200, c.start)
 
     # ================================================================ tabs
 
@@ -137,6 +139,20 @@ class MainWindow(QMainWindow):
         page_btn.setToolTip("تقدر تضغطها من جوالك بعد من صفحة /remote المكتوبة تحت")
         page_btn.clicked.connect(self.c.translate_page)
         v.addWidget(page_btn)
+        easy = QHBoxLayout()
+        self.auto_check = QCheckBox("ابدأ الترجمة تلقائيًا لما أفتح البرنامج")
+        self.auto_check.setToolTip("البرنامج ينتظر لين تفتح PS Remote Play ويبدأ بنفسه")
+        self.auto_check.toggled.connect(lambda on: self._set("auto_start", on))
+        easy.addWidget(self.auto_check)
+        self.login_check = QCheckBox("شغّل البرنامج مع ويندوز")
+        self.login_check.setEnabled(winapi.can_run_at_login())
+        if not winapi.can_run_at_login():
+            self.login_check.setToolTip("متاح في النسخة الجاهزة (PlayTranslate.exe)")
+        self.login_check.setChecked(winapi.run_at_login())
+        self.login_check.toggled.connect(self._toggle_login)
+        easy.addWidget(self.login_check)
+        easy.addStretch(1)
+        v.addLayout(easy)
 
         self.update_label = QLabel()
         self.update_label.setOpenExternalLinks(True)
@@ -454,6 +470,7 @@ class MainWindow(QMainWindow):
             self.sens_slider.setValue(p.sensitivity)
             self.speaker_check.setChecked(p.split_speaker)
             self.tv_check.setChecked(self.cfg.send_to_tv)
+            self.auto_check.setChecked(self.cfg.auto_start)
             self.local_check.setChecked(self.cfg.local_overlay)
             r = p.region
             self.region_label.setText(
@@ -633,6 +650,13 @@ class MainWindow(QMainWindow):
         self.status_label.setText(text)
         self.status_label.setStyleSheet(
             f"padding: 6px; border-radius: 4px; background: #eceff1; color: {color}; font-weight: bold;")
+
+    def _toggle_login(self, on: bool):
+        if not winapi.set_run_at_login(on):
+            self.login_check.blockSignals(True)
+            self.login_check.setChecked(winapi.run_at_login())
+            self.login_check.blockSignals(False)
+            self._on_status("ما قدرت أغيّر التشغيل مع ويندوز.", "warn")
 
     def _on_update_available(self, version: str, url: str):
         self.update_label.setText(
