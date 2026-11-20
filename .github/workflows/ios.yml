@@ -1,0 +1,96 @@
+# iPhone/iPad app. Separate from build.yml on purpose: it never touches the
+# laptop program, the TV app or their releases.
+name: iOS app
+
+on:
+  push:
+    branches: ["**"]
+    # Pushing a tag like ios-v0.1.0 publishes the IPA (tags never match build.yml's "v*").
+    tags: ["ios-v*"]
+    paths: ["mobile/**", "packs/**", ".github/workflows/ios.yml"]
+  pull_request:
+    paths: ["mobile/**", "packs/**", ".github/workflows/ios.yml"]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Publish the IPA as a pre-release with this tag (must start with ios-, e.g. ios-v0.1.0). Leave empty to only build."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ios:
+    runs-on: macos-15
+    timeout-minutes: 45
+    defaults:
+      run:
+        working-directory: mobile/ios
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate the Xcode project
+        run: xcodegen generate
+
+      - name: Unit tests (simulator)
+        run: |
+          set -o pipefail
+          UDID=$(xcrun simctl list devices available -j | python3 -c "
+          import json, sys
+          d = json.load(sys.stdin)['devices']
+          print(next(x['udid'] for k, v in sorted(d.items(), reverse=True) if 'iOS' in k for x in v if x['name'].startswith('iPhone')))
+          ")
+          echo "Simulator: $UDID"
+          xcodebuild test -project PlayTranslate.xcodeproj -scheme PlayTranslate \
+            -destination "id=$UDID" -derivedDataPath build/test \
+            CODE_SIGNING_ALLOWED=NO | tail -n 80
+
+      - name: Build for iPhone and iPad (unsigned)
+        run: |
+          set -o pipefail
+          xcodebuild build -project PlayTranslate.xcodeproj -scheme PlayTranslate \
+            -configuration Release -sdk iphoneos -destination 'generic/platform=iOS' \
+            -derivedDataPath build/device CODE_SIGNING_ALLOWED=NO | tail -n 80
+
+      - name: Package the IPA
+        # Ad-hoc signing only records the entitlements (the App Group). SideStore or AltStore
+        # re-sign the app with the player's own free Apple ID when they install it.
+        run: |
+          APP=build/device/Build/Products/Release-iphoneos/PlayTranslate.app
+          test -d "$APP/PlugIns/Broadcast.appex"
+          codesign --force --sign - --entitlements Broadcast/Broadcast.entitlements "$APP/PlugIns/Broadcast.appex"
+          codesign --force --sign - --entitlements App/PlayTranslate.entitlements "$APP"
+          codesign -d --entitlements - "$APP/PlugIns/Broadcast.appex"
+          mkdir -p out/Payload
+          cp -R "$APP" out/Payload/
+          (cd out && zip -qry PlayTranslate.ipa Payload)
+          ls -lh out/PlayTranslate.ipa
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: PlayTranslate-ios
+          path: mobile/ios/out/PlayTranslate.ipa
+          if-no-files-found: error
+
+      - name: Publish pre-release
+        if: startsWith(github.ref, 'refs/tags/ios-') || (github.event_name == 'workflow_dispatch' && startsWith(inputs.release_tag, 'ios-'))
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag || github.ref_name }}
+          target_commitish: ${{ github.sha }}
+          name: PlayTranslate iPhone/iPad ${{ inputs.release_tag || github.ref_name }}
+          # Never "latest": the laptop download links use releases/latest.
+          make_latest: "false"
+          prerelease: true
+          files: mobile/ios/out/PlayTranslate.ipa
+          body: |
+            تطبيق PlayTranslate للآيفون والآيباد. التثبيت مجاني عن طريق SideStore أو AltStore،
+            والشرح في docs/INSTALL-ios-ar.md.

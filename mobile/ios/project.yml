@@ -1,0 +1,104 @@
+# XcodeGen spec for the iPhone/iPad app. CI runs `xcodegen generate` on macOS;
+# the generated PlayTranslate.xcodeproj is not committed.
+name: PlayTranslate
+options:
+  bundleIdPrefix: com.playtranslate
+  deploymentTarget:
+    iOS: "16.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    SWIFT_VERSION: "5.0"
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    DEVELOPMENT_TEAM: ""
+    CODE_SIGN_STYLE: Manual
+targets:
+  PlayTranslate:
+    type: application
+    platform: iOS
+    sources:
+      - path: App
+      - path: Shared
+      - path: ../../packs/gta-vi.json
+        buildPhase: resources
+    info:
+      path: App/Info.plist
+      properties:
+        CFBundleDisplayName: PlayTranslate
+        CFBundleDevelopmentRegion: ar
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        ITSAppUsesNonExemptEncryption: false
+        UILaunchScreen: {}
+        UIRequiresFullScreen: false
+        NSLocalNetworkUsageDescription: "يرسل الترجمة العربية إلى تطبيق PlayTranslate على التلفزيون في شبكة البيت."
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+    entitlements:
+      path: App/PlayTranslate.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.playtranslate.mobile
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.playtranslate.mobile
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+    dependencies:
+      - target: Broadcast
+  Broadcast:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: Broadcast
+      - path: Shared
+      - path: ../../packs/gta-vi.json
+        buildPhase: resources
+    info:
+      path: Broadcast/Info.plist
+      properties:
+        CFBundleDisplayName: PlayTranslate
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.broadcast-services-upload
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).SampleHandler
+          RPBroadcastProcessMode: RPBroadcastProcessModeSampleBuffer
+    entitlements:
+      path: Broadcast/Broadcast.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.playtranslate.mobile
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.playtranslate.mobile.Broadcast
+  PlayTranslateTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests
+    dependencies:
+      - target: PlayTranslate
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.playtranslate.mobile.tests
+        TEST_HOST: $(BUILT_PRODUCTS_DIR)/PlayTranslate.app/PlayTranslate
+        BUNDLE_LOADER: $(TEST_HOST)
+schemes:
+  PlayTranslate:
+    build:
+      targets:
+        PlayTranslate: all
+        Broadcast: all
+    test:
+      targets:
+        - PlayTranslateTests
