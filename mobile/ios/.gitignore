@@ -6,3 +6,4 @@ Broadcast/Info.plist
 Broadcast/Broadcast.entitlements
 build/
 out/
+third_party/

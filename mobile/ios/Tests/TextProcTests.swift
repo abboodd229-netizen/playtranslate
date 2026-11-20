@@ -1,5 +1,5 @@
 import XCTest
-@testable import PlayTranslate
+
 
 final class TextProcTests: XCTestCase {
     func testCleanLine() {
