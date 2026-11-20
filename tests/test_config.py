@@ -1,4 +1,5 @@
 import json
+import sys
 
 from playtranslate.config import AppConfig, GameProfile, Region, load_config, save_config
 
@@ -11,7 +12,11 @@ def test_roundtrip_and_tolerant_loading(tmp_path):
     path = tmp_path / "config.json"
     save_config(cfg, path)
     raw = json.loads(path.read_text(encoding="utf-8"))
-    assert raw["deepl_api_key"] != "" and "secret" in raw["deepl_api_key"]  # plain: prefix off Windows
+    if sys.platform == "win32":
+        # Encrypted with the Windows account; the key itself never appears in the file.
+        assert raw["deepl_api_key"].startswith("dpapi:") and "secret" not in raw["deepl_api_key"]
+    else:
+        assert raw["deepl_api_key"] == "plain:secret:fx"
     loaded = load_config(path)
     assert loaded.deepl_api_key == "secret:fx"
     assert loaded.profile.name == "RDR2" and loaded.profile.glossary == {"Arthur": "آرثر"}
