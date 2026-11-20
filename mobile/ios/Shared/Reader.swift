@@ -61,7 +61,19 @@ final class Reader {
         lock.lock(); pageRequested = true; lock.unlock()
     }
 
+    /// A screen-recording frame (ReplayKit), which may carry a rotation.
     func submit(_ sample: CMSampleBuffer) {
+        guard let pixels = CMSampleBufferGetImageBuffer(sample) else { return }
+        var orientation = CGImagePropertyOrientation.up
+        if let raw = CMGetAttachment(sample, key: "RPVideoSampleOrientationKey" as CFString, attachmentModeOut: nil) as? NSNumber,
+           let o = CGImagePropertyOrientation(rawValue: raw.uint32Value) {
+            orientation = o
+        }
+        submit(pixels: pixels, orientation: orientation)
+    }
+
+    /// A game frame. Frames from the built-in Remote Play stream are upright 16:9 pictures.
+    func submit(pixels: CVPixelBuffer, orientation: CGImagePropertyOrientation = .up) {
         let now = CFAbsoluteTimeGetCurrent()
         lock.lock()
         if busy || now - lastStart < interval {
@@ -74,15 +86,6 @@ final class Reader {
         pageRequested = false
         lock.unlock()
 
-        guard let pixels = CMSampleBufferGetImageBuffer(sample) else {
-            lock.lock(); busy = false; lock.unlock()
-            return
-        }
-        var orientation = CGImagePropertyOrientation.up
-        if let raw = CMGetAttachment(sample, key: "RPVideoSampleOrientationKey" as CFString, attachmentModeOut: nil) as? NSNumber,
-           let o = CGImagePropertyOrientation(rawValue: raw.uint32Value) {
-            orientation = o
-        }
         work.async { [self] in
             autoreleasepool { process(pixels, orientation: orientation, page: page) }
             lock.lock(); busy = false; lock.unlock()

@@ -1,5 +1,5 @@
 import XCTest
-@testable import PlayTranslate
+
 
 final class TextProcTests: XCTestCase {
     func testCleanLine() {
@@ -56,7 +56,8 @@ final class GlossaryTests: XCTestCase {
     }
 
     func testBundledPackLoads() {
-        let pack = Pack.load(named: "gta-vi")
+        // No app host: the pack is bundled into the test bundle itself.
+        let pack = Pack.load(named: "gta-vi", bundle: Bundle(for: GlossaryTests.self))
         XCTAssertEqual(pack.glossary["Lucia"], "لوسيا")
     }
 }

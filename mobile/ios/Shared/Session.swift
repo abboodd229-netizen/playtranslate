@@ -1,4 +1,5 @@
 import CoreMedia
+import CoreVideo
 import Foundation
 
 /// Everything that runs while the screen is being shared: TV server, beacon, reader, status.
@@ -49,6 +50,10 @@ final class Session {
 
     func handle(_ sample: CMSampleBuffer) {
         reader.submit(sample)
+    }
+
+    func handle(pixels: CVPixelBuffer) {
+        reader.submit(pixels: pixels)
     }
 
     func stop() {
