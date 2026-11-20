@@ -45,8 +45,11 @@ jobs:
         id: chiaki-cache
         uses: actions/cache@v4
         with:
-          path: mobile/ios/third_party/pylux/ios/build-iphoneos
-          key: chiaki-ios-macos26-${{ hashFiles('mobile/ios/scripts/fetch-pylux.sh', 'mobile/ios/scripts/build-chiaki.sh') }}
+          # version.h is generated into Pylux's source tree when the library is configured.
+          path: |
+            mobile/ios/third_party/pylux/ios/build-iphoneos
+            mobile/ios/third_party/pylux/lib/include/chiaki/version.h
+          key: chiaki-ios-macos26-v2-${{ hashFiles('mobile/ios/scripts/fetch-pylux.sh', 'mobile/ios/scripts/build-chiaki.sh') }}
 
       - name: Install the library's build tools
         if: steps.chiaki-cache.outputs.cache-hit != 'true'
