@@ -190,3 +190,26 @@ def exclude_from_capture(hwnd: int) -> bool:
         return bool(_user32().SetWindowDisplayAffinity(hwnd, WDA_EXCLUDEFROMCAPTURE))
     except (AttributeError, OSError):
         return False
+
+
+def keep_awake(on: bool) -> bool:
+    """Stop Windows sleeping or turning the screen off while we watch the game.
+
+    Nobody touches the laptop while playing, so after the idle timeout Windows
+    would sleep or blank the display and the Remote Play picture would stop.
+    The request belongs to the calling thread and ends with it, so call it from
+    the long-running worker thread.
+    """
+    if not IS_WINDOWS:
+        return False
+    import ctypes
+
+    ES_CONTINUOUS, ES_SYSTEM_REQUIRED, ES_DISPLAY_REQUIRED = 0x80000000, 0x00000001, 0x00000002
+    flags = ES_CONTINUOUS | (ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED if on else 0)
+    try:
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        kernel32.SetThreadExecutionState.argtypes = [ctypes.c_uint32]
+        kernel32.SetThreadExecutionState.restype = ctypes.c_uint32
+        return bool(kernel32.SetThreadExecutionState(flags))
+    except (AttributeError, OSError):
+        return False

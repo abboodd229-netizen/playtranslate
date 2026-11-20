@@ -23,6 +23,7 @@ from .detect import DetectorSettings, Gone, Stable, SubtitleDetector
 from .ocr import OcrEngine, OcrUnavailable, create_engine
 from .textproc import Segment, joined, similar, to_segments
 from .translate import TranslationResult, TranslationService
+from .winapi import keep_awake
 
 log = logging.getLogger(__name__)
 
@@ -125,6 +126,7 @@ class Pipeline:
 
     def _run(self) -> None:
         reason = ""
+        keep_awake(True)
         try:
             if self._ocr is None:
                 self.on_status("جارٍ تحميل محرك القراءة…", "info")
@@ -145,6 +147,7 @@ class Pipeline:
             reason = f"خطأ غير متوقع: {exc}"
             self.on_status(reason, "error")
         finally:
+            keep_awake(False)
             self._do_hide()
             if self.source is not None:
                 try:

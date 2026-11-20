@@ -42,3 +42,10 @@ def test_window_helpers_and_dpapi():
     stored = keystore.protect("abc:fx")
     assert stored.startswith("dpapi:")
     assert keystore.unprotect(stored) == "abc:fx"
+
+
+def test_keep_awake_request_and_release():
+    from playtranslate.winapi import keep_awake
+
+    assert keep_awake(True)
+    assert keep_awake(False)
