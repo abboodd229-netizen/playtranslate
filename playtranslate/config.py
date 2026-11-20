@@ -65,6 +65,8 @@ def _from_dict(cls, data: Any):
                 value = str(value)
             elif isinstance(current, dict):
                 value = dict(value) if isinstance(value, dict) else current
+            elif isinstance(current, list):
+                value = [str(v) for v in value] if isinstance(value, list) else current
         except (TypeError, ValueError):
             log.warning("Ignoring bad config value %s.%s=%r", cls.__name__, f.name, value)
             continue
@@ -125,6 +127,32 @@ class GameProfile:
             self.name = "افتراضي"
 
 
+def preset_profiles() -> list[GameProfile]:
+    """Ready-made profiles added once to every config (the user can edit or delete them)."""
+    return [
+        GameProfile(
+            name="GTA VI",
+            # Bottom centre only: leaves out the minimap (bottom left) and the
+            # money/weapon HUD on the right, which would otherwise be read as text.
+            region=Region(x=0.17, y=0.77, w=0.66, h=0.19),
+            text_mode="light",
+            split_speaker=True,
+            sensitivity=55,
+            glossary={
+                "Lucia": "لوسيا",
+                "Jason": "جيسون",
+                "Vice City": "فايس سيتي",
+                "Leonida": "ليونيدا",
+                "Leonida Keys": "جزر ليونيدا",
+                "Port Gellhorn": "بورت جيلهورن",
+                "Grassrivers": "غراس ريفرز",
+                "Ambrosia": "أمبروزيا",
+                "Mount Kalaga": "جبل كالاغا",
+            },
+        ),
+    ]
+
+
 @dataclass
 class Style:
     """How the Arabic text looks on the TV and in the laptop overlay."""
@@ -173,6 +201,10 @@ class AppConfig:
     linger_ms: int = 700
     active_profile: str = "افتراضي"
     profiles: dict = field(default_factory=dict)
+    # Names of built-in presets already offered, so a deleted preset never comes back.
+    seen_presets: list = field(default_factory=list)
+    # Look for a newer version on GitHub at start-up.
+    check_updates: bool = True
     style: Style = field(default_factory=Style)
 
     def normalize(self) -> None:
@@ -192,6 +224,12 @@ class AppConfig:
         if not profiles:
             p = GameProfile()
             profiles[p.name] = p
+        for preset in preset_profiles():
+            if preset.name not in self.seen_presets:
+                self.seen_presets.append(preset.name)
+                if preset.name not in profiles:
+                    preset.normalize()
+                    profiles[preset.name] = preset
         self.profiles = profiles
         if self.active_profile not in self.profiles:
             self.active_profile = next(iter(self.profiles))

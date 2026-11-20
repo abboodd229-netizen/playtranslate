@@ -45,3 +45,14 @@ def test_region_pixels_stay_inside():
     r.normalize()
     x, y, w, h = r.to_pixels(1920, 1080)
     assert x + w <= 1920 and y + h <= 1080 and w > 0 and h > 0
+
+
+def test_gta_preset_added_once_and_stays_deleted(tmp_path):
+    path = tmp_path / "config.json"
+    cfg = load_config(path)
+    gta = cfg.profiles["GTA VI"]
+    # The region stays clear of the minimap in the bottom-left corner.
+    assert gta.region.x >= 0.16 and gta.glossary["Vice City"] == "فايس سيتي"
+    del cfg.profiles["GTA VI"]
+    save_config(cfg, path)
+    assert "GTA VI" not in load_config(path).profiles

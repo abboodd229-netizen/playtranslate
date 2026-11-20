@@ -96,6 +96,7 @@ class MainWindow(QMainWindow):
         c.overlay_sink.shown.connect(self.overlay.show_lines)
         c.overlay_sink.hidden.connect(self.overlay.clear)
         self.deepl_result.connect(self._on_deepl_result)
+        c.update_available.connect(self._on_update_available)
 
         self._load_profile_into_ui()
         self._refresh_addresses()
@@ -105,6 +106,7 @@ class MainWindow(QMainWindow):
             self._on_status(c.engine_problem, "warn")
         else:
             self._on_status("جاهز. شغّل PS Remote Play ثم اضغط «ابدأ».", "info")
+        c.check_for_updates()
 
     # ================================================================ tabs
 
@@ -132,6 +134,12 @@ class MainWindow(QMainWindow):
         top.addLayout(prof_box, 3)
         v.addLayout(top)
 
+        self.update_label = QLabel()
+        self.update_label.setOpenExternalLinks(True)
+        self.update_label.setWordWrap(True)
+        self.update_label.setStyleSheet("padding: 6px; border-radius: 4px; background: #fff8e1; color: #6d4c00;")
+        self.update_label.hide()
+        v.addWidget(self.update_label)
         self.status_label = QLabel()
         self.status_label.setWordWrap(True)
         self.status_label.setStyleSheet("padding: 6px; border-radius: 4px; background: #eceff1;")
@@ -619,6 +627,12 @@ class MainWindow(QMainWindow):
         self.status_label.setText(text)
         self.status_label.setStyleSheet(
             f"padding: 6px; border-radius: 4px; background: #eceff1; color: {color}; font-weight: bold;")
+
+    def _on_update_available(self, version: str, url: str):
+        self.update_label.setText(
+            f"نسخة جديدة متوفرة ({version}). <a href='{url}'>حمّلها من هنا</a>، "
+            f"وفك ضغطها مكان القديمة. إعداداتك وقاموسك يظلون محفوظين.")
+        self.update_label.show()
 
     def _on_engines_message(self, text: str, level: str):
         if text:

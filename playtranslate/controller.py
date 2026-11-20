@@ -47,6 +47,7 @@ class Controller(QObject):
     clients_changed = Signal(list)
     running_changed = Signal(bool)
     engines_message = Signal(str, str)
+    update_available = Signal(str, str)  # version, url
 
     def __init__(self, cfg: AppConfig, source_spec: tuple[str, str] | None = None):
         super().__init__()
@@ -61,6 +62,20 @@ class Controller(QObject):
         self.pipeline: Pipeline | None = None
         self._ocr: OcrEngine | None = None
         self.ocr_name = ""
+
+    def check_for_updates(self) -> None:
+        """Look for a newer release in the background; emits update_available."""
+        if not self.cfg.check_updates or self.source_spec is not None:
+            return
+
+        def work():
+            from .updates import check_latest
+
+            found = check_latest()
+            if found:
+                self.update_available.emit(*found)
+
+        threading.Thread(target=work, name="update-check", daemon=True).start()
 
     # ---- engines -----------------------------------------------------
 
