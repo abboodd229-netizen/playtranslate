@@ -36,6 +36,29 @@ jobs:
           SDKMANAGER=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)
           yes | "$SDKMANAGER" --licenses > /dev/null || true
           "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+      - name: Signing key
+        env:
+          KEYSTORE_B64: ${{ secrets.PT_KEYSTORE_B64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.PT_KEYSTORE_PASSWORD }}
+        run: |
+          # Optional secrets PT_KEYSTORE_B64 / PT_KEYSTORE_PASSWORD (alias "playtranslate") give every
+          # build the same signature, so new versions install over old ones. Without them a
+          # one-off key is made, and updating means uninstalling the old app first.
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/pt.jks"
+            PW="$KEYSTORE_PASSWORD"
+          else
+            PW=$(openssl rand -hex 16)
+            keytool -genkeypair -keystore "$RUNNER_TEMP/pt.jks" -storepass "$PW" -keypass "$PW" \
+              -alias playtranslate -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=PlayTranslate"
+          fi
+          echo "::add-mask::$PW"
+          {
+            echo "PT_KEYSTORE=$RUNNER_TEMP/pt.jks"
+            echo "PT_KEYSTORE_PASSWORD=$PW"
+            echo "PT_KEY_ALIAS=playtranslate"
+            echo "PT_KEY_PASSWORD=$PW"
+          } >> "$GITHUB_ENV"
       - name: Build TV app
         working-directory: tv-app
         run: |

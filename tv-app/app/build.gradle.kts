@@ -16,8 +16,8 @@ android {
     }
 
     signingConfigs {
-        // A fixed debug-style key so updates install over the previous version.
-        // Set PT_KEYSTORE / PT_KEYSTORE_PASSWORD / PT_KEY_ALIAS / PT_KEY_PASSWORD for your own key.
+        // Uses PT_KEYSTORE / PT_KEYSTORE_PASSWORD / PT_KEY_ALIAS / PT_KEY_PASSWORD when set (CI always
+        // sets them); otherwise the local Android debug key, so Android Studio builds just work.
         create("release") {
             val ks = System.getenv("PT_KEYSTORE")
             if (ks != null && file(ks).exists()) {
