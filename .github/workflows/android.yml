@@ -1,0 +1,83 @@
+# Android phone app. Separate from build.yml on purpose: it never touches the
+# laptop program, the TV app or their releases.
+name: Android app
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["mobile/android/**", "packs/**", ".github/workflows/android.yml"]
+  pull_request:
+    paths: ["mobile/android/**", "packs/**", ".github/workflows/android.yml"]
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: "Publish the APK as a pre-release with this tag (must start with android-, e.g. android-v0.1.0). Leave empty to only build."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+          cache: gradle
+      - name: Android SDK packages (the runner already has the SDK)
+        run: |
+          SDKMANAGER=$(ls -d "$ANDROID_HOME"/cmdline-tools/*/bin/sdkmanager | sort -V | tail -1)
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "platforms;android-34" "build-tools;34.0.0" > /dev/null
+      - name: Signing key (same key as the TV app, read only)
+        env:
+          SIGNING_PASSWORD: ${{ secrets.PT_SIGNING_PASSWORD }}
+        run: |
+          ENC=tv-app/signing/release.jks.enc
+          if [ -n "$SIGNING_PASSWORD" ] && [ -f "$ENC" ]; then
+            echo "::add-mask::$SIGNING_PASSWORD"
+            openssl enc -d -aes-256-cbc -pbkdf2 -iter 600000 -in "$ENC" -out "$RUNNER_TEMP/pt.jks" -pass env:SIGNING_PASSWORD
+            {
+              echo "PT_KEYSTORE=$RUNNER_TEMP/pt.jks"
+              echo "PT_KEYSTORE_PASSWORD=$SIGNING_PASSWORD"
+              echo "PT_KEY_ALIAS=playtranslate"
+              echo "PT_KEY_PASSWORD=$SIGNING_PASSWORD"
+            } >> "$GITHUB_ENV"
+          else
+            echo "::warning::No signing key available (fork PR?): the APK is signed with a throw-away debug key."
+          fi
+      - name: Unit tests and APK
+        working-directory: mobile/android
+        run: |
+          chmod +x gradlew
+          ./gradlew --no-daemon testReleaseUnitTest assembleRelease
+          cp app/build/outputs/apk/release/app-release.apk ../../PlayTranslate-Android.apk
+          ls -lh ../../PlayTranslate-Android.apk
+      - uses: actions/upload-artifact@v5
+        with:
+          name: PlayTranslate-Android-apk
+          path: PlayTranslate-Android.apk
+          if-no-files-found: error
+      - name: Publish pre-release
+        if: github.event_name == 'workflow_dispatch' && startsWith(inputs.release_tag, 'android-')
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ inputs.release_tag }}
+          target_commitish: ${{ github.sha }}
+          name: PlayTranslate Android ${{ inputs.release_tag }}
+          # Never "latest": the laptop download links use releases/latest.
+          make_latest: "false"
+          prerelease: true
+          files: PlayTranslate-Android.apk
+          body: |
+            تطبيق PlayTranslate للجوالات الأندرويد (أندرويد 8 أو أحدث). نزّل الملف وثبّته مباشرة،
+            وطريقة الاستخدام في الدليل: docs/INSTALL-ar.md.
