@@ -8,8 +8,8 @@ options:
   createIntermediateGroups: true
 settings:
   base:
-    MARKETING_VERSION: "0.2.0"
-    CURRENT_PROJECT_VERSION: "2"
+    MARKETING_VERSION: "0.3.0"
+    CURRENT_PROJECT_VERSION: "3"
     SWIFT_VERSION: "5.0"
     IPHONEOS_DEPLOYMENT_TARGET: "16.0"
     TARGETED_DEVICE_FAMILY: "1,2"
@@ -50,6 +50,7 @@ targets:
         UILaunchScreen: {}
         UIRequiresFullScreen: false
         NSLocalNetworkUsageDescription: "يتصل بالبلايستيشن في شبكة البيت، ويرسل الترجمة العربية إلى تطبيق PlayTranslate على التلفزيون."
+        NSCameraUsageDescription: "في وضع الكاميرا يقرأ التطبيق الترجمة الإنجليزية من شاشة التلفزيون. الصور ما تنحفظ ولا تطلع من الجوال."
         NSAppTransportSecurity:
           NSAllowsArbitraryLoads: true
         UIBackgroundModes:

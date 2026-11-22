@@ -85,3 +85,23 @@ final class ReaderGeometryTests: XCTestCase {
         XCTAssertEqual(roi.width, 1, accuracy: 0.0001)
     }
 }
+
+final class CameraModeTests: XCTestCase {
+    func testArabicSitsAboveTheReadArea() {
+        // GTA VI reads from 77% down: the TV text must end above that line.
+        let gta = Settings.marginAbove(GameProfile.gtaVI.region)
+        XCTAssertGreaterThan(gta, 1 - 0.77)
+        XCTAssertLessThan(gta, 0.3)
+        // Never lower than the normal margin, never off the screen.
+        XCTAssertEqual(Settings.marginAbove(CGRect(x: 0, y: 0.95, width: 1, height: 0.05)), 0.17, accuracy: 0.001)
+        XCTAssertEqual(Settings.marginAbove(CGRect(x: 0, y: 0, width: 1, height: 0.2)), 0.9, accuracy: 0.001)
+    }
+
+    func testCameraStyleOnlyMovesTheText() {
+        var s = Settings()
+        s.profileID = GameProfile.gtaVI.id
+        XCTAssertEqual(s.tvStyle["bottom_margin"] as? Double, 0.17)
+        XCTAssertEqual(s.tvStyle(aboveReadArea: true)["bottom_margin"] as? Double, Settings.marginAbove(s.effectiveRegion))
+    }
+}
+

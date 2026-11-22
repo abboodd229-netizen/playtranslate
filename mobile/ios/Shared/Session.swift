@@ -14,9 +14,10 @@ final class Session {
     private var heartbeat: DispatchSourceTimer?
     var onFatal: ((String) -> Void)?
 
-    init(settings: Settings, name: String = "PlayTranslate (iPhone)") {
+    /// `keepReadAreaVisible`: draw the Arabic above the read area (camera mode, see Settings.tvStyle).
+    init(settings: Settings, name: String = "PlayTranslate (iPhone)", keepReadAreaVisible: Bool = false) {
         self.settings = settings
-        server = DisplayServer(name: name, style: settings.tvStyle)
+        server = DisplayServer(name: name, style: settings.tvStyle(aboveReadArea: keepReadAreaVisible))
         beacon = Beacon(name: name)
         reader = Reader(settings: settings, server: server, cache: cache)
         reader.onStatus = { [weak self] en, ar, err, ms in

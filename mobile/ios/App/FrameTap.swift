@@ -2,8 +2,9 @@ import CoreMedia
 import CoreVideo
 import UIKit
 
-/// Receives the decoded game picture from the built-in Remote Play stream (Pylux's video
-/// decoder calls `callback`, see scripts/patch-pylux.py) and runs the translation session:
+/// Receives the game picture, from the built-in Remote Play stream (Pylux's video decoder calls
+/// `callback`, see scripts/patch-pylux.py) or from camera mode (CameraMode.swift), and runs the
+/// translation session:
 /// reader, TV server and beacon. The session starts with the first frame of a stream and
 /// stops a few seconds after the frames stop, so the player never has to press anything.
 final class FrameTap {
@@ -32,7 +33,8 @@ final class FrameTap {
         return session != nil
     }
 
-    func feed(_ pixels: CVPixelBuffer) {
+    /// `camera`: the picture is the TV filmed by the camera (the Arabic must not cover the English).
+    func feed(_ pixels: CVPixelBuffer, camera: Bool = false) {
         lock.lock()
         lastFrame = CFAbsoluteTimeGetCurrent()
         let current: Session
@@ -40,7 +42,7 @@ final class FrameTap {
         if let s = session {
             current = s
         } else {
-            current = Session(settings: Settings.load())
+            current = Session(settings: Settings.load(), keepReadAreaVisible: camera)
             session = current
             started = true
         }

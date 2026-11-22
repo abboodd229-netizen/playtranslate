@@ -8,6 +8,7 @@ struct TranslateView: View {
     @State private var keyMessage = ""
     @State private var checkingKey = false
     @State private var cacheCount = 0
+    @State private var showCamera = false
     @StateObject private var tester = TVTester()
     @Environment(\.scenePhase) private var scenePhase
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -32,6 +33,7 @@ struct TranslateView: View {
             .navigationTitle("PlayTranslate")
         }
         .navigationViewStyle(.stack)
+        .fullScreenCover(isPresented: $showCamera) { CameraModeView() }
         .onAppear {
             tester.askLocalNetworkOnce()
             cacheCount = TranslationCache().count
@@ -95,6 +97,17 @@ struct TranslateView: View {
             }
             .buttonStyle(.borderedProminent)
             Text("الريموت بلاي صار داخل التطبيق. من تبويب \"البلايستيشن\" اربط جهازك أول مرة، وبعدها اضغط عليه عشان يبدأ البث. الترجمة تشتغل لحالها مع أول صورة وتطلع على التلفزيون، وتوقف لما توقف البث. خلّ التطبيق مفتوح والجوال على الشاحن.")
+                .font(.footnote).foregroundColor(.secondary)
+            Button {
+                tester.stop()
+                showCamera = true
+            } label: {
+                Label("وضع الكاميرا", systemImage: "camera.viewfinder")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, minHeight: 40)
+            }
+            .buttonStyle(.bordered)
+            Text("وضع الكاميرا: الجوال على ستاند قدام التلفزيون ويقرأ الترجمة من الشاشة. ما يلمس البلايستيشن أبد، فاللعبة ما تتأثر، ويشتغل مع أي جهاز. الترجمة العربية تطلع فوق سطر الإنجليزي عشان الكاميرا تظل تشوفه.")
                 .font(.footnote).foregroundColor(.secondary)
             DisclosureGroup("الطريقة القديمة: تسجيل الشاشة مع تطبيق سوني") {
                 HStack(spacing: 12) {
