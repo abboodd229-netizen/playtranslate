@@ -4,11 +4,16 @@
 
 Arabic subtitles for console games, drawn over the game on the TV.
 
-The PS5 plays on the TV directly (no added input lag). A Windows laptop watches the
-same screen through PS Remote Play (secondary PSN account), reads the English subtitle
-line, translates it with DeepL, and sends the Arabic text to a small Android TV app that
-draws it over the HDMI input. If the TV can't run the app, the laptop can draw the
-Arabic over the Remote Play window instead.
+The console plays on the TV directly (no added input lag). Something else reads the English
+subtitle line, translates it with DeepL, and sends the Arabic text to a small Android TV app
+that draws it over the HDMI input. Four ways to read the game:
+
+- **Windows laptop**: watches the screen through PS Remote Play (secondary PSN account). The
+  most accurate; can also draw the Arabic over the Remote Play window when the TV can't run the app.
+- **iPhone / iPad** (`mobile/ios`): Remote Play built into the app, no laptop. Experimental.
+- **Phone camera** (same iPhone app): the phone on a stand films the TV. No laptop, no second
+  PSN account, never talks to the console, works with any console.
+- **Android phone** (`mobile/android`): screen capture over PS Remote Play. Experimental.
 
 Arabic install guide: [docs/INSTALL-ar.md](docs/INSTALL-ar.md)
 
