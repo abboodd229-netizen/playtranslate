@@ -54,6 +54,8 @@ final class FrameTap {
 
     private func begin(_ s: Session) {
         s.onFatal = { [weak self] _ in self?.stop() }
+        s.server.onShow = { lines, mode in PhoneSubtitle.shared.show(lines, page: mode == "page") }
+        s.server.onHide = { PhoneSubtitle.shared.clear() }
         s.start()
         let t = DispatchSource.makeTimerSource(queue: .global(qos: .utility))
         t.schedule(deadline: .now() + 1, repeating: 1)
@@ -85,6 +87,7 @@ final class FrameTap {
         lock.unlock()
         guard let s else { return }
         s.stop()
+        PhoneSubtitle.shared.clear()
         DispatchQueue.main.async {
             UIApplication.shared.isIdleTimerDisabled = false
         }

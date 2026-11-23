@@ -113,6 +113,10 @@ final class DisplayServer {
     var onTranslatePage: (() -> Void)?
     /// Called once when the port could not be opened after several tries.
     var onFailure: ((String) -> Void)?
+    /// Also called for every show/hide, so the phone can draw the same Arabic on its own screen (camera mode).
+    /// Set before start(); called on the caller's thread.
+    var onShow: (([[String: String]], String) -> Void)?
+    var onHide: (() -> Void)?
 
     init(name: String, style: [String: Any]) {
         self.name = name
@@ -259,6 +263,7 @@ final class DisplayServer {
 
     /// lines: [["speaker": "...", "text": "..."]]; mode "page" = whole-screen translation.
     func show(_ lines: [[String: String]], mode: String = "subtitle") {
+        onShow?(lines, mode)
         queue.async { [self] in
             seq += 1
             var msg: [String: Any] = ["type": "show", "seq": seq, "lines": lines]
@@ -269,6 +274,7 @@ final class DisplayServer {
     }
 
     func hide() {
+        onHide?()
         queue.async { [self] in
             state = nil
             broadcast(["type": "hide", "seq": seq])
