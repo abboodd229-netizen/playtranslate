@@ -1,4 +1,5 @@
 import CoreMedia
+import CoreVideo
 import Foundation
 
 /// Everything that runs while the screen is being shared: TV server, beacon, reader, status.
@@ -13,9 +14,10 @@ final class Session {
     private var heartbeat: DispatchSourceTimer?
     var onFatal: ((String) -> Void)?
 
-    init(settings: Settings, name: String = "PlayTranslate (iPhone)") {
+    /// `keepReadAreaVisible`: draw the Arabic above the read area (camera mode, see Settings.tvStyle).
+    init(settings: Settings, name: String = "PlayTranslate (iPhone)", keepReadAreaVisible: Bool = false) {
         self.settings = settings
-        server = DisplayServer(name: name, style: settings.tvStyle)
+        server = DisplayServer(name: name, style: settings.tvStyle(aboveReadArea: keepReadAreaVisible))
         beacon = Beacon(name: name)
         reader = Reader(settings: settings, server: server, cache: cache)
         reader.onStatus = { [weak self] en, ar, err, ms in
@@ -49,6 +51,10 @@ final class Session {
 
     func handle(_ sample: CMSampleBuffer) {
         reader.submit(sample)
+    }
+
+    func handle(pixels: CVPixelBuffer) {
+        reader.submit(pixels: pixels)
     }
 
     func stop() {

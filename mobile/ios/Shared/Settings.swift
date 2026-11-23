@@ -88,10 +88,21 @@ struct Settings: Equatable {
     }
 
     /// Style message for the TV app (same fields and defaults as the laptop).
-    var tvStyle: [String: Any] {
+    var tvStyle: [String: Any] { tvStyle(aboveReadArea: false) }
+
+    /// With `aboveReadArea` the Arabic sits just above the area being read instead of over it.
+    /// Camera mode needs this: the camera films the TV, so Arabic drawn over the English line
+    /// would hide the very text it reads, and the subtitle would flicker on and off.
+    func tvStyle(aboveReadArea: Bool) -> [String: Any] {
         ["font_family": "Noto Naskh Arabic", "font_size": fontSize, "text_color": "#FFFFFF",
          "speaker_color": "#FFD54F", "background_color": "#000000", "background_opacity": 0.55,
-         "outline": true, "bottom_margin": 0.17, "max_width": 0.8]
+         "outline": true, "bottom_margin": aboveReadArea ? Settings.marginAbove(effectiveRegion) : 0.17,
+         "max_width": 0.8]
+    }
+
+    /// Bottom margin (share of the screen height) that puts the TV text above `region`.
+    static func marginAbove(_ region: CGRect) -> Double {
+        min(0.9, max(0.17, Double(1 - region.minY) + 0.02))
     }
 }
 

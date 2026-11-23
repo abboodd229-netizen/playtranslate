@@ -8,8 +8,8 @@ options:
   createIntermediateGroups: true
 settings:
   base:
-    MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "0.3.0"
+    CURRENT_PROJECT_VERSION: "3"
     SWIFT_VERSION: "5.0"
     IPHONEOS_DEPLOYMENT_TARGET: "16.0"
     TARGETED_DEVICE_FAMILY: "1,2"
@@ -24,6 +24,21 @@ targets:
       - path: Shared
       - path: ../../packs/gta-vi.json
         buildPhase: resources
+      # Built-in Remote Play: Pylux (open-source Chiaki fork, AGPL-3.0), fetched and patched
+      # by scripts/fetch-pylux.sh. Its own app entry point, icon and plist are left out.
+      - path: third_party/pylux/ios/Pylux
+        excludes:
+          - "App/PyluxApp.swift"
+          - "Assets.xcassets"
+          - "Info.plist"
+          - "Pylux.entitlements"
+          - "Donation/DonationProducts.storekit"
+      - path: third_party/pylux/gui/res/license/agpl_license.txt
+        buildPhase: resources
+      - path: third_party/pylux/gui/res/license/disclaimer.txt
+        buildPhase: resources
+      - path: third_party/pylux/shared/donation_prompt_phrases.json
+        buildPhase: resources
     info:
       path: App/Info.plist
       properties:
@@ -34,7 +49,13 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         UILaunchScreen: {}
         UIRequiresFullScreen: false
-        NSLocalNetworkUsageDescription: "يرسل الترجمة العربية إلى تطبيق PlayTranslate على التلفزيون في شبكة البيت."
+        NSLocalNetworkUsageDescription: "يتصل بالبلايستيشن في شبكة البيت، ويرسل الترجمة العربية إلى تطبيق PlayTranslate على التلفزيون."
+        NSCameraUsageDescription: "في وضع الكاميرا يقرأ التطبيق الترجمة الإنجليزية من شاشة التلفزيون. الصور ما تنحفظ ولا تطلع من الجوال."
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+        UIBackgroundModes:
+          - audio
+        GCSupportsControllerUserInteraction: true
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
           - UIInterfaceOrientationLandscapeLeft
@@ -53,6 +74,26 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.playtranslate.mobile
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        # Chiaki C library, built by scripts/build-chiaki.sh (device only).
+        SWIFT_OBJC_BRIDGING_HEADER: third_party/pylux/ios/Pylux/Bridge/ChiakiBridge.h
+        CLANG_ENABLE_OBJC_ARC: YES
+        HEADER_SEARCH_PATHS:
+          - "$(SRCROOT)/third_party/pylux/lib/include"
+          - "$(SRCROOT)/third_party/pylux/ios/build-iphoneos/parent/lib/include"
+        LIBRARY_SEARCH_PATHS:
+          - "$(SRCROOT)/third_party/pylux/ios/build-iphoneos"
+        OTHER_LDFLAGS:
+          - "-lchiaki_complete"
+          - "-lz"
+          - "-framework Security"
+          - "-framework Foundation"
+          - "-framework CoreServices"
+          - "-framework VideoToolbox"
+          - "-framework AVFoundation"
+          - "-framework AVKit"
+          - "-framework AudioToolbox"
+          - "-framework CoreMedia"
+          - "-framework CoreVideo"
     dependencies:
       - target: Broadcast
   Broadcast:
@@ -82,23 +123,28 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.playtranslate.mobile.Broadcast
   PlayTranslateTests:
+    # Logic tests on the shared code only, without the app as host: the app links the
+    # device-only Chiaki library, so it is never built for the simulator.
     type: bundle.unit-test
     platform: iOS
     sources:
       - path: Tests
-    dependencies:
-      - target: PlayTranslate
+      - path: Shared
+      - path: ../../packs/gta-vi.json
+        buildPhase: resources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.playtranslate.mobile.tests
-        TEST_HOST: $(BUILT_PRODUCTS_DIR)/PlayTranslate.app/PlayTranslate
-        BUNDLE_LOADER: $(TEST_HOST)
 schemes:
   PlayTranslate:
     build:
       targets:
         PlayTranslate: all
         Broadcast: all
+  PlayTranslateTests:
+    build:
+      targets:
+        PlayTranslateTests: [test]
     test:
       targets:
         - PlayTranslateTests

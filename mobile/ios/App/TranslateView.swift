@@ -1,11 +1,14 @@
 import SwiftUI
 
-struct ContentView: View {
+struct TranslateView: View {
+    /// Switches to the PlayStation tab (built-in Remote Play).
+    var openPlayStation: () -> Void = {}
     @State private var settings = Settings.load()
     @State private var status = BroadcastStatus.load()
     @State private var keyMessage = ""
     @State private var checkingKey = false
     @State private var cacheCount = 0
+    @State private var showCamera = false
     @StateObject private var tester = TVTester()
     @Environment(\.scenePhase) private var scenePhase
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -30,11 +33,15 @@ struct ContentView: View {
             .navigationTitle("PlayTranslate")
         }
         .navigationViewStyle(.stack)
+        .fullScreenCover(isPresented: $showCamera) { CameraModeView() }
         .onAppear {
             tester.askLocalNetworkOnce()
             cacheCount = TranslationCache().count
         }
         .onReceive(timer) { _ in status = BroadcastStatus.load() }
+        .onReceive(NotificationCenter.default.publisher(for: FrameTap.sessionStarted)) { _ in
+            tester.stop()   // the translation needs the TV port
+        }
         .onChange(of: settings) { newValue in newValue.save() }
         .onChange(of: scenePhase) { phase in
             if phase != .active { tester.stop() }
@@ -80,21 +87,43 @@ struct ContentView: View {
 
     private var startSection: some View {
         Section {
-            HStack(spacing: 12) {
-                Button {
-                    tester.stop()   // frees the TV port for the screen reader
-                    BroadcastLauncher.shared.open()
-                } label: {
-                    Label(status.isLive ? "إيقاف الترجمة" : "ابدأ الترجمة",
-                          systemImage: status.isLive ? "stop.circle.fill" : "play.circle.fill")
-                        .font(.title3.bold())
-                        .frame(maxWidth: .infinity, minHeight: 44)
-                }
-                .buttonStyle(.borderedProminent)
-                SystemBroadcastButton().frame(width: 44, height: 44)
+            Button {
+                tester.stop()
+                openPlayStation()
+            } label: {
+                Label("ابدأ: افتح البلايستيشن", systemImage: "gamecontroller.fill")
+                    .font(.title3.bold())
+                    .frame(maxWidth: .infinity, minHeight: 44)
             }
-            Text("بعد الضغط اختر \"PlayTranslate\" ثم \"بدء البث\"، وبعدها افتح تطبيق PS Remote Play وشغّل اللعبة. الترجمة تطلع على التلفزيون. للإيقاف اضغط الشريط الأحمر أعلى الشاشة أو ارجع هنا.")
+            .buttonStyle(.borderedProminent)
+            Text("الريموت بلاي صار داخل التطبيق. من تبويب \"البلايستيشن\" اربط جهازك أول مرة، وبعدها اضغط عليه عشان يبدأ البث. الترجمة تشتغل لحالها مع أول صورة وتطلع على التلفزيون، وتوقف لما توقف البث. خلّ التطبيق مفتوح والجوال على الشاحن.")
                 .font(.footnote).foregroundColor(.secondary)
+            Button {
+                tester.stop()
+                showCamera = true
+            } label: {
+                Label("وضع الكاميرا", systemImage: "camera.viewfinder")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, minHeight: 40)
+            }
+            .buttonStyle(.bordered)
+            Text("وضع الكاميرا: الجوال على ستاند قدام التلفزيون ويقرأ الترجمة من الشاشة. ما يلمس البلايستيشن أبد، فاللعبة ما تتأثر، ويشتغل مع أي جهاز. الترجمة العربية تطلع فوق سطر الإنجليزي عشان الكاميرا تظل تشوفه.")
+                .font(.footnote).foregroundColor(.secondary)
+            DisclosureGroup("الطريقة القديمة: تسجيل الشاشة مع تطبيق سوني") {
+                HStack(spacing: 12) {
+                    Button {
+                        tester.stop()   // frees the TV port for the screen reader
+                        BroadcastLauncher.shared.open()
+                    } label: {
+                        Label("تسجيل الشاشة", systemImage: "record.circle")
+                            .frame(maxWidth: .infinity, minHeight: 44)
+                    }
+                    .buttonStyle(.bordered)
+                    SystemBroadcastButton().frame(width: 44, height: 44)
+                }
+                Text("اختر \"PlayTranslate\" ثم \"بدء البث\"، وبعدها افتح PS Remote Play. إذا طلعت الصورة سوداء استخدم الطريقة اللي فوق.")
+                    .font(.footnote).foregroundColor(.secondary)
+            }
         }
     }
 
@@ -185,10 +214,11 @@ struct ContentView: View {
         Section {
             VStack(alignment: .leading, spacing: 8) {
                 Text("١. ركّب تطبيق PlayTranslate في التلفزيون (نفس تطبيق اللابتوب).")
-                Text("٢. ادخل حساب PSN ثاني في PS Remote Play على الجوال، عشان تلعب أنت بحسابك على التلفزيون.")
+                Text("٢. شغّل البلايستيشن بحسابك اللي تلعب فيه، وخلّه هو والجوال على نفس الواي فاي.")
                 Text("٣. الصق مفتاح DeepL واضغط \"اختبار التلفزيون\" مرة وحدة.")
-                Text("٤. اضغط \"ابدأ الترجمة\" ثم افتح PS Remote Play.")
-                Text("٥. خلّ الجوال على الشاحن وشاشته شغالة طول اللعب.")
+                Text("٤. في تبويب \"البلايستيشن\": سجّل دخول بحساب PSN ثاني (مو حسابك اللي تلعب فيه) واربط الجهاز مرة وحدة.")
+                Text("٥. اضغط على البلايستيشن عشان يبدأ البث، والعب على التلفزيون بيدك العادية.")
+                Text("٦. خلّ الجوال على الشاحن والتطبيق مفتوح طول اللعب.")
             }
             .font(.callout)
         } header: { Text("طريقة الاستخدام") }

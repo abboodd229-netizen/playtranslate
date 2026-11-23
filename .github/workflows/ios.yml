@@ -26,8 +26,9 @@ concurrency:
 
 jobs:
   ios:
-    runs-on: macos-15
-    timeout-minutes: 45
+    # macos-26 (Xcode 26): the same image Pylux builds its iOS app on.
+    runs-on: macos-26
+    timeout-minutes: 90
     defaults:
       run:
         working-directory: mobile/ios
@@ -36,6 +37,18 @@ jobs:
 
       - name: Install XcodeGen
         run: brew install xcodegen
+
+      - name: Fetch and patch the Remote Play code (Pylux, pinned)
+        run: ./scripts/fetch-pylux.sh
+
+      - name: Install the library's build tools
+        run: |
+          for i in 1 2 3; do brew install cmake ninja protobuf@29 python-setuptools && break; sleep $((i * 15)); done
+          pip3 install --user --break-system-packages 'protobuf>=5,<6'
+          echo "$(brew --prefix)/opt/protobuf@29/bin" >> "$GITHUB_PATH"
+
+      - name: Build the Remote Play library (Chiaki, device)
+        run: ./scripts/build-chiaki.sh
 
       - name: Generate the Xcode project
         run: xcodegen generate
@@ -49,7 +62,7 @@ jobs:
           print(next(x['udid'] for k, v in sorted(d.items(), reverse=True) if 'iOS' in k for x in v if x['name'].startswith('iPhone')))
           ")
           echo "Simulator: $UDID"
-          xcodebuild test -project PlayTranslate.xcodeproj -scheme PlayTranslate \
+          xcodebuild test -project PlayTranslate.xcodeproj -scheme PlayTranslateTests \
             -destination "id=$UDID" -derivedDataPath build/test \
             CODE_SIGNING_ALLOWED=NO | tail -n 80
 
@@ -66,6 +79,11 @@ jobs:
         run: |
           APP=build/device/Build/Products/Release-iphoneos/PlayTranslate.app
           test -d "$APP/PlugIns/Broadcast.appex"
+          # The built-in Remote Play must really be linked in, not dead-stripped away.
+          ls -lh "$APP/PlayTranslate"
+          N=$(strings "$APP/PlayTranslate" | grep -ciE "chiaki|takion" || true)
+          echo "Remote Play strings in the app: $N"
+          test "$N" -gt 20
           codesign --force --sign - --entitlements Broadcast/Broadcast.entitlements "$APP/PlugIns/Broadcast.appex"
           codesign --force --sign - --entitlements App/PlayTranslate.entitlements "$APP"
           codesign -d --entitlements - "$APP/PlugIns/Broadcast.appex"
@@ -94,3 +112,7 @@ jobs:
           body: |
             تطبيق PlayTranslate للآيفون والآيباد. التثبيت مجاني عن طريق SideStore أو AltStore،
             والشرح في docs/INSTALL-ios-ar.md.
+
+            الريموت بلاي داخل التطبيق مبني على Pylux (نسخة مفتوحة المصدر من Chiaki) برخصة AGPL-3.0.
+            الكود الكامل: هذا المستودع + https://github.com/ForWard-Technologies-LLC/Pylux
+            (النسخة والتعديلات في mobile/ios/scripts/fetch-pylux.sh و patch-pylux.py).
