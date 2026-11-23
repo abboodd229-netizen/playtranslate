@@ -19,7 +19,7 @@ a{color:#FFC94D}a:hover{color:#FFE09A}
 .flow{display:flex;align-items:stretch;gap:12px}
 .flow-arrow{display:flex;align-items:center;justify-content:center;flex:0 0 28px}
 .toc{display:flex;flex-wrap:wrap;gap:10px}
-.picker{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.picker{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
 .picker button{font-family:inherit;cursor:pointer;text-align:center}
 .shot img{display:block;width:100%;height:auto}
 .tv{container-type:inline-size}
@@ -29,7 +29,7 @@ code{font-family:ui-monospace,Consolas,monospace;direction:ltr;unicode-bidi:isol
 @media (max-width:820px){
 .wrap{padding:0 16px}
 .grid2,.grid3{grid-template-columns:minmax(0,1fr)}
-.picker{gap:8px}
+.picker{gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
 .picker button{min-height:118px !important;padding:12px 4px !important;border-radius:14px !important;gap:4px !important}
 .picker button span:first-of-type{font-size:15px !important}
 .picker button span:last-of-type{font-size:11.5px !important}
@@ -67,7 +67,12 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <button type="button" data-pick="ios" aria-pressed="false">
 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2.5"></rect><path d="M11 18h2"></path></svg>
 <span style="font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 19px">آيفون وآيباد</span>
-<span style="font-size: 14px; opacity: 0.8">بدون لابتوب · تجريبي</span>
+<span style="font-size: 14px; opacity: 0.8">ريموت بلاي في التطبيق · تجريبي</span>
+</button>
+<button type="button" data-pick="camera" aria-pressed="false">
+<svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"></path><circle cx="12" cy="13" r="3.5"></circle></svg>
+<span style="font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 19px">كاميرا الجوال</span>
+<span style="font-size: 14px; opacity: 0.8">آيفون على ستاند · الأسهل</span>
 </button>
 <button type="button" data-pick="android" aria-pressed="false">
 <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 10a6 6 0 0 1 12 0v7H6z"></path><path d="M8 4l1.5 2.2M16 4l-1.5 2.2"></path><circle cx="9.5" cy="10" r="0.6" fill="currentColor"></circle><circle cx="14.5" cy="10" r="0.6" fill="currentColor"></circle><path d="M3.5 11v4M20.5 11v4M9 17v3M15 17v3"></path></svg>
@@ -87,7 +92,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 </div>
 <p style="margin: 0; font-size: 14px; color: #8C94A4">ملف ويندوز يحتوي تطبيق التلفزيون ونسخة من هذا الدليل. يشتغل على ويندوز 10 (إصدار 1809 أو أحدث) وويندوز 11.</p>
 </pt-if>
-<pt-if data-on="ios">
+<pt-if data-on="ios camera">
 <div style="display: flex; flex-wrap: wrap; gap: 14px">
 <a href="https://github.com/abboodd229-netizen/playtranslate/releases/download/ios-v0.4.0/PlayTranslate.ipa" style="display: inline-flex; align-items: center; gap: 10px; min-height: 52px; padding: 0 26px; border-radius: 12px; background: #FFC94D; color: #14161B; font-weight: 700; text-decoration: none">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"></path><path d="M7 10l5 5 5-5"></path><path d="M4 20h16"></path></svg>
@@ -162,7 +167,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <path d="M1236 512 H1268 C1276 512 1281 518 1282 527 C1283 536 1280 540 1276 540 C1272 540 1270 537 1267 534 H1260 L1255 543 L1250 534 H1244 C1241 537 1239 540 1235 540 C1231 540 1228 536 1229 527 C1230 518 1235 512 1236 512 Z" fill="#FFC94D"></path>
 <path d="M1162 560 H1338" stroke="#323C4E" stroke-width="6" stroke-linecap="round"></path>
 </g>
-<g data-on="ios android">
+<g data-on="ios android camera">
 <rect x="1190" y="478" width="132" height="68" rx="14" fill="#1C222B" stroke="#323C4E" stroke-width="2"></rect>
 <rect x="1200" y="484" width="112" height="56" rx="7" fill="url(#pt-sky)"></rect>
 <circle cx="1262" cy="520" r="10" fill="#FFE3A3" opacity="0.9"></circle>
@@ -186,7 +191,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <rect x="636" y="632" width="22" height="46" rx="10" fill="#2A3242"></rect>
 <rect x="782" y="632" width="22" height="46" rx="10" fill="#2A3242"></rect>
 </svg></div>
-<figcaption style="color: #A6ADBB; font-size: 15px; text-align: center"><pt-if data-on="laptop">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، واللابتوب يقرأ الحوار ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if><pt-if data-on="ios">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، والآيفون على ستاند قدام التلفزيون يصوّر الشاشة بالكاميرا، ويقرأ الحوار ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if><pt-if data-on="android">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، وجوال الأندرويد يقرأ الحوار من PS Remote Play ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if> (رسمة توضيحية)</figcaption>
+<figcaption style="color: #A6ADBB; font-size: 15px; text-align: center"><pt-if data-on="laptop">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، واللابتوب يقرأ الحوار ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if><pt-if data-on="ios">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، والآيفون أو الآيباد يستقبل صورة اللعبة داخل التطبيق (ريموت بلاي)، ويقرأ الحوار ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if><pt-if data-on="camera">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، والآيفون على ستاند قدام التلفزيون يصوّر الشاشة بالكاميرا، ويقرأ الحوار ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if><pt-if data-on="android">هكذا يشتغل: أنت تلعب على التلفزيون مثل العادة، وجوال الأندرويد يقرأ الحوار من PS Remote Play ويرسل الترجمة العربية للتلفزيون عبر الواي فاي.</pt-if> (رسمة توضيحية)</figcaption>
 </figure>
 </section>
 
@@ -212,8 +217,16 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <a href="#need" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">وش تحتاج</a>
 <a href="#ios1" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">١. تطبيق الآيفون</a>
 <a href="#s2" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٢. تطبيق التلفزيون</a>
-<a href="#ios5" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٣. العب بوضع الكاميرا</a>
-<a href="#ios3" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٤. اختياري: الريموت بلاي</a>
+<a href="#ios3" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٣. أول تشغيل</a>
+<a href="#ios4" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٤. وقت اللعب</a>
+<a href="#fix" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">حل المشاكل</a>
+</pt-if>
+<pt-if data-on="camera">
+<a href="#how" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">كيف يشتغل</a>
+<a href="#need" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">وش تحتاج</a>
+<a href="#ios1" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">١. تطبيق الآيفون</a>
+<a href="#s2" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٢. تطبيق التلفزيون</a>
+<a href="#ios5" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">٣. العب بالكاميرا</a>
 <a href="#fix" style="padding: 8px 16px; border-radius: 999px; background: #1B1F28; color: #DDE1E8; text-decoration: none; font-size: 15px">حل المشاكل</a>
 </pt-if>
 <pt-if data-on="android">
@@ -278,10 +291,10 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <p style="margin: 0; color: #FFC94D; font-weight: 700; font-size: 15px">قبل ما تبدأ</p>
 <h2 style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 38px; line-height: 1.35">وش تحتاج</h2>
 </div>
-<pt-if data-on="ios">
+<pt-if data-on="camera">
 <div style="display: flex; gap: 12px; align-items: flex-start; background: #14201F; border: 1px solid #24403D; border-radius: 14px; padding: 16px 20px">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ED3C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 20px; margin-top: 5px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
-<p style="margin: 0; color: #CFE7E4; font-size: 16px">بوضع الكاميرا تحتاج بس: <b>الآيفون، ستاند، تلفزيون Google TV أو Android TV، ومفتاح DeepL مجاني</b>. بدون لابتوب ولا حساب PSN ثاني، ويشتغل مع أي جهاز ألعاب. الحساب الثاني للريموت بلاي بس (اختياري).</p>
+<p style="margin: 0; color: #CFE7E4; font-size: 16px">بوضع الكاميرا تحتاج بس: <b>الآيفون، ستاند، تلفزيون Google TV أو Android TV، ومفتاح DeepL مجاني</b>. بدون لابتوب ولا حساب PSN ثاني، ويشتغل مع أي جهاز ألعاب. وتقدر تتخطى أي شي في الدليل عن الحساب الثاني والريموت بلاي.</p>
 </div>
 </pt-if>
 <div class="grid3">
@@ -350,7 +363,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 
 </pt-if>
 <!-- ============ PHONE STEP 1 ============ -->
-<pt-if data-on="ios">
+<pt-if data-on="ios camera">
 <section id="ios1" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
 <div style="display: flex; align-items: center; gap: 18px">
 <span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">١</span>
@@ -411,7 +424,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <pt-if data-on="laptop">
 <p style="margin: 0; max-width: 820px; color: #C9CED8">التلفزيون ينزّل تطبيقه من اللابتوب نفسه، فما تحتاج فلاشة ولا كمبيوتر ثاني. خلّ برنامج اللابتوب شغّال وأنت تسوي هذي الخطوة.</p>
 </pt-if>
-<pt-if data-on="ios android">
+<pt-if data-on="ios android camera">
 <p style="margin: 0; max-width: 820px; color: #C9CED8">نفس تطبيق التلفزيون حق اللابتوب. التلفزيون ينزّله من الإنترنت مباشرة.</p>
 </pt-if>
 <div class="grid2">
@@ -422,7 +435,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <li>في برنامج اللابتوب، تبويب <b>التشغيل</b>، تلقى سطر فيه عنوان مثل <code>http://192.168.1.20:8765/tv.apk</code> (الأرقام تختلف عندك).</li>
 <li>اكتب هذا العنوان في Downloader، وبينزل التطبيق ويثبّته.</li>
 </pt-if>
-<pt-if data-on="ios android">
+<pt-if data-on="ios android camera">
 <li>اكتب في Downloader هذا العنوان: <code>github.com/abboodd229-netizen/playtranslate/releases/latest/download/PlayTranslateTV.apk</code>، وبينزل التطبيق ويثبّته.</li>
 </pt-if>
 <li>افتح <b>PlayTranslate</b> في التلفزيون، واضغط «منح صلاحية العرض فوق التطبيقات» وفعّلها.</li>
@@ -437,7 +450,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <figcaption style="color: #A6ADBB; font-size: 14px">تبويب التشغيل. المستطيل الأصفر هو العنوان اللي تكتبه في Downloader.</figcaption>
 </figure>
 </pt-if>
-<pt-if data-on="ios android">
+<pt-if data-on="ios android camera">
 <div style="display: flex; gap: 12px; align-items: flex-start; background: #14201F; border: 1px solid #24403D; border-radius: 14px; padding: 16px 20px">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6ED3C9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 20px; margin-top: 5px"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5M12 16h.01"></path></svg>
 <p style="margin: 0; color: #CFE7E4; font-size: 15px">ما تعرف تكتب العنوان؟ في Downloader فيه لوحة مفاتيح على الشاشة. اكتبه بالضبط مثل ما هو، الأحرف الكبيرة والصغيرة تفرق.</p>
@@ -457,11 +470,11 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <p style="margin: 0; color: #A6ADBB; font-size: 15px">بعدها التطبيق يشتغل بنفسه كل ما تشغّل التلفزيون، ويلقى اللابتوب أو الجوال تلقائيًا بدون ما تكتب أي عنوان.</p>
 </div>
 </section>
-<pt-if data-on="ios">
+<pt-if data-on="camera">
 <section id="ios5" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
 <div style="display: flex; align-items: center; gap: 18px">
 <span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٣</span>
-<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">العب بوضع الكاميرا (بدون لابتوب)</h2>
+<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">العب بالكاميرا</h2>
 </div>
 <p style="margin: 0; max-width: 820px; color: #C9CED8">الجوال على ستاند قدام التلفزيون: الكاميرا الخلفية تقرأ الترجمة الإنجليزية من الشاشة، والعربي يطلع على التلفزيون فوق سطر الإنجليزي. ما يحتاج لابتوب ولا حساب PSN ثاني، ويشتغل مع أي جهاز ألعاب، وما يلمس البلايستيشن فاللعبة ما تتأثر.</p>
 <div class="grid2">
@@ -768,8 +781,8 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <pt-if data-on="ios">
 <section id="ios3" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
 <div style="display: flex; align-items: center; gap: 18px">
-<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٤</span>
-<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">اختياري: الريموت بلاي، أول تشغيل</h2>
+<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٣</span>
+<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">أول تشغيل</h2>
 </div>
 <div class="grid2">
 <ol style="margin: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 14px">
@@ -794,8 +807,8 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 </section>
 <section id="ios4" class="wrap" style="padding-top: 104px; display: flex; flex-direction: column; gap: 28px">
 <div style="display: flex; align-items: center; gap: 18px">
-<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٥</span>
-<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">الريموت بلاي: وقت اللعب</h2>
+<span style="flex: 0 0 56px; height: 56px; border-radius: 14px; background: #FFC94D; color: #14161B; display: inline-flex; align-items: center; justify-content: center; font-family: 'Readex Pro', sans-serif; font-weight: 700; font-size: 26px">٤</span>
+<h2 class="step-title" style="margin: 0; font-family: 'Readex Pro', sans-serif; font-size: 34px; line-height: 1.35">وقت اللعب</h2>
 </div>
 <div class="grid2">
 <ol style="margin: 0; padding-right: 22px; display: flex; flex-direction: column; gap: 14px">
@@ -811,7 +824,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 </div>
 <div style="display: flex; gap: 12px; align-items: flex-start; background: #1E1B12; border: 1px solid #5A4A1E; border-radius: 14px; padding: 16px 20px">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFC94D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: 0 0 20px; margin-top: 5px"><path d="M12 3l9 16H3z"></path><path d="M12 10v4M12 17h.01"></path></svg>
-<p style="margin: 0; color: #E3DAC0; font-size: 15px">نسخة الآيفون جديدة وللحين ما انجربت على بلايستيشن حقيقي. لو حسّيت إن اللعبة صارت أبطأ والبث شغّال، استخدم <a href="#ios5">وضع الكاميرا</a>.</p>
+<p style="margin: 0; color: #E3DAC0; font-size: 15px">نسخة الآيفون جديدة وللحين ما انجربت على بلايستيشن حقيقي. لو حسّيت إن اللعبة صارت أبطأ والبث شغّال، جرّب <a href="#camera">كاميرا الجوال</a> من فوق.</p>
 </div>
 </div>
 </div>
@@ -890,7 +903,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <pt-if data-on="laptop">
 <div class="trow"><span style="font-weight: 700">تحديث تطبيق التلفزيون ما يتثبت</span><span style="color: #C9CED8; font-size: 16px">لو عندك نسخة أقدم من 0.2.2، احذفها مرة وحدة وثبّت الجديدة. من 0.2.2 وطالع التحديثات تنزل فوق القديم مباشرة.</span></div>
 </pt-if>
-<pt-if data-on="ios">
+<pt-if data-on="ios camera">
 <div class="trow"><span style="font-weight: 700">التطبيق ما يفتح بعد أسبوع</span><span style="color: #C9CED8; font-size: 16px">افتح SideStore أو AltStore واضغط Refresh All. هذا شرط آبل للتوقيع المجاني.</span></div>
 <div class="trow"><span style="font-weight: 700">التلفزيون «ينتظر» وما يتصل</span><span style="color: #C9CED8; font-size: 16px">نفس الواي فاي؟ سمحت بإذن «الشبكة المحلية» (الإعدادات ← PlayTranslate)؟ وإلا اكتب عنوان الجوال يدويًا في تطبيق التلفزيون.</span></div>
 <div class="trow"><span style="font-weight: 700">«التثبيت ما فعّل مشاركة الإعدادات»</span><span style="color: #C9CED8; font-size: 16px">أعد تثبيت التطبيق عن طريق SideStore أو AltStore نفسه، مو أداة توقيع ثانية.</span></div>
@@ -898,7 +911,10 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 <pt-if data-on="ios">
 <div class="trow"><span style="font-weight: 700">التطبيق ما يقرأ شي</span><span style="color: #C9CED8; font-size: 16px">تأكد إن البث شغّال في تبويب البلايستيشن، وإن الترجمة الإنجليزية مفعّلة في اللعبة. شوف «آخر ما قرأته»، ولو المربع الأزرق مو على مكان الترجمة فعّل «تعديل مكان الترجمة يدويًا».</span></div>
 <div class="trow"><span style="font-weight: 700">البث يوقف لما أطلع من التطبيق</span><span style="color: #C9CED8; font-size: 16px">طبيعي: الآيفون يوقف البث في الخلفية. خلّ التطبيق مفتوح والجوال على الشاحن.</span></div>
-<div class="trow"><span style="font-weight: 700">وضع الكاميرا ما يقرأ زين</span><span style="color: #C9CED8; font-size: 16px">قرّب لين التلفزيون يملأ الإطار الأبيض، خفّف الانعكاس على الشاشة، وثبّت الجوال على ستاند.</span></div>
+</pt-if>
+<pt-if data-on="camera">
+<div class="trow"><span style="font-weight: 700">ما يقرأ شي</span><span style="color: #C9CED8; font-size: 16px">تأكد إن الترجمة الإنجليزية مفعّلة في اللعبة، وإن شاشة التلفزيون تملأ الإطار الأبيض والمربع الأزرق على مكان الترجمة. شوف «آخر ما قرأته» فوق في شاشة الكاميرا.</span></div>
+<div class="trow"><span style="font-weight: 700">يقرأ غلط أو يتأخر</span><span style="color: #C9CED8; font-size: 16px">قرّب لين التلفزيون يملأ الإطار الأبيض، خفّف الانعكاس على الشاشة، وثبّت الجوال على ستاند.</span></div>
 </pt-if>
 <pt-if data-on="android">
 <div class="trow"><span style="font-weight: 700">التطبيق ما يقرأ شي، أو «آخر ما قرأته» فاضي</span><span style="color: #C9CED8; font-size: 16px">سجّل الشاشة وأنت في PS Remote Play: لو الفيديو أسود، فـ Remote Play يمنع تسجيل الشاشة في جهازك واستخدم اللابتوب. لو الصورة تطلع، عدّل مكان الترجمة يدويًا.</span></div>
@@ -939,7 +955,7 @@ pt-if{display:contents}pt-if[hidden]{display:none}
 </div>
 <script>
 (function(){
-var A='#FFC94D',ids=['laptop','ios','android'];
+var A='#FFC94D',ids=['laptop','ios','camera','android'];
 function tile(on){return 'display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:150px;padding:18px 14px;border-radius:18px;line-height:1.5;'+(on?'background:'+A+';color:#14161B;border:2px solid '+A+';':'background:#171A21;color:#ECEEF2;border:2px solid #2E3442;');}
 function set(p,push){
   document.querySelectorAll('[data-on]').forEach(function(e){var off=e.getAttribute('data-on').split(' ').indexOf(p)<0;if(e.tagName==='PT-IF')e.hidden=off;else e.style.display=off?'none':'';});
@@ -950,6 +966,7 @@ var h=(location.hash||'').slice(1),p='laptop';
 if(ids.indexOf(h)>=0)p=h;else{var ua=navigator.userAgent||'';
   if(/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1))p='ios';else if(/Android/.test(ua))p='android';}
 document.querySelectorAll('[data-pick]').forEach(function(b){b.addEventListener('click',function(){set(b.getAttribute('data-pick'),true);});});
+window.addEventListener('hashchange',function(){var h=(location.hash||'').slice(1);if(ids.indexOf(h)>=0){set(h,false);window.scrollTo(0,0);}});
 set(p,false);
 })();
 </script>
