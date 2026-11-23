@@ -98,7 +98,7 @@ PlayTranslate يعرض ترجمة عربية لحوارات ألعاب البل�
 
 1. اتبع شرح التثبيت الرسمي: https://docs.sidestore.io (يحتاج اللابتوب وكيبل الجوال مرة وحدة).
 2. في الجوال: الإعدادات ← الخصوصية والأمان ← **وضع المطور** (Developer Mode) ← شغّله وأعد التشغيل.
-3. نزّل ملف **PlayTranslate.ipa** من صفحة الإصدارات في GitHub (الإصدار اللي اسمه يبدأ بـ ios-)، آخر نسخة: https://github.com/abboodd229-netizen/playtranslate/releases/download/ios-v0.3.0/PlayTranslate.ipa ، واحفظه في "الملفات".
+3. نزّل ملف **PlayTranslate.ipa** من صفحة الإصدارات في GitHub (الإصدار اللي اسمه يبدأ بـ ios-)، آخر نسخة: https://github.com/abboodd229-netizen/playtranslate/releases/download/ios-v0.4.0/PlayTranslate.ipa ، واحفظه في "الملفات".
 4. افتح SideStore ← My Apps ← زر **+** ← اختر PlayTranslate.ipa.
 5. كل أسبوع: افتح SideStore واضغط **Refresh All**.
 
@@ -130,7 +130,7 @@ PlayTranslate يعرض ترجمة عربية لحوارات ألعاب البل�
 4. للإيقاف: اقفل البث في التطبيق، والترجمة توقف بعدها بثواني.
 5. الطريقة القديمة (تسجيل الشاشة مع تطبيق PS Remote Play) موجودة تحت «الطريقة القديمة» إذا احتجتها.
 
-### وضع الكاميرا (بدون ريموت بلاي)
+### وضع الكاميرا (الأسهل: بدون ريموت بلاي ولا حساب ثاني)
 
 إذا حسّيت إن اللعبة صارت أبطأ والريموت بلاي شغّال، أو تبي تلعب على إكس بوكس أو سويتش:
 

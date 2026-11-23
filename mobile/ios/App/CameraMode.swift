@@ -169,71 +169,26 @@ struct CameraPreview: UIViewRepresentable {
     func updateUIView(_ uiView: CameraPreviewView, context: Context) {}
 }
 
-/// The Arabic the reader is showing right now, for the phone's own screen in camera mode
-/// (the phone on its stand faces the player, so it can be the subtitle screen; no TV app needed).
-final class PhoneSubtitle: ObservableObject {
-    static let shared = PhoneSubtitle()
-
-    struct Line: Identifiable, Equatable {
-        let id: Int
-        let speaker: String
-        let text: String
-    }
-
-    @Published private(set) var lines: [Line] = []
-    @Published private(set) var page = false
-    /// Counts every translation shown, so the camera screen can notice the first one.
-    @Published private(set) var shownCount = 0
-
-    func show(_ raw: [[String: String]], page: Bool) {
-        let lines = raw.enumerated().compactMap { i, l -> Line? in
-            let text = (l["text"] ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-            return text.isEmpty ? nil : Line(id: i, speaker: l["speaker"] ?? "", text: text)
-        }
-        DispatchQueue.main.async {
-            self.lines = lines
-            self.page = page
-            self.shownCount += 1
-        }
-    }
-
-    func clear() {
-        DispatchQueue.main.async {
-            self.lines = []
-            self.page = false
-        }
-    }
-}
-
 /// Full-screen camera mode, opened from the translation tab.
-/// Two screens: aiming (camera picture with the guide frame) and the subtitle screen
-/// (big Arabic on the phone, small camera picture in the corner).
 struct CameraModeView: View {
     @Environment(\.dismiss) private var dismiss
     @StateObject private var reader = CameraReader()
-    @ObservedObject private var subtitle = PhoneSubtitle.shared
     @State private var zoom: CGFloat = 1
     @State private var status = BroadcastStatus.load()
-    @State private var aiming = true
-    @State private var autoSwitched = false
     private let settings = Settings.load()
     private let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
-            if aiming {
-                CameraPreview(reader: reader).ignoresSafeArea()
-                guideOverlay.ignoresSafeArea()
-                VStack {
-                    topBar
-                    Spacer()
-                    bottomBar
-                }
-                .padding()
-            } else {
-                subtitleScreen
+            CameraPreview(reader: reader).ignoresSafeArea()
+            guideOverlay.ignoresSafeArea()
+            VStack {
+                topBar
+                Spacer()
+                bottomBar
             }
+            .padding()
             if reader.permissionDenied || reader.noCamera { blockedMessage }
         }
         .environment(\.layoutDirection, .rightToLeft)
@@ -248,90 +203,7 @@ struct CameraModeView: View {
             AppOrientationLock.unlockAfterStream()
         }
         .onReceive(timer) { _ in status = BroadcastStatus.load() }
-        .onChange(of: subtitle.shownCount) { _ in
-            // The first translation means the aim is right: switch to the subtitle screen by itself, once.
-            if aiming && !autoSwitched && !subtitle.lines.isEmpty {
-                autoSwitched = true
-                withAnimation { aiming = false }
-            }
-        }
     }
-
-    // MARK: subtitle screen
-
-    /// What the player looks at while playing: the Arabic, big, on the phone.
-    private var subtitleScreen: some View {
-        VStack(spacing: 0) {
-            HStack(alignment: .top) {
-                statusPill
-                Spacer()
-                // Small camera picture; tap it to go back to aiming.
-                CameraPreview(reader: reader)
-                    .frame(width: 160, height: 90)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
-                    .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.white.opacity(0.4)))
-                    .overlay(alignment: .bottom) {
-                        Text("اضبط الكاميرا").font(.caption2.bold()).foregroundColor(.white).padding(3)
-                            .background(Color.black.opacity(0.6), in: Capsule()).padding(4)
-                    }
-                    .overlay(Color.white.opacity(0.001).onTapGesture { withAnimation { aiming = true } })
-                    .accessibilityElement()
-                    .accessibilityLabel("اضبط الكاميرا")
-                    .accessibilityAddTraits(.isButton)
-                    .accessibilityAction { aiming = true }
-                closeButton
-            }
-            Spacer(minLength: 8)
-            if subtitle.lines.isEmpty {
-                Text("الترجمة العربية بتطلع هنا")
-                    .font(.title3)
-                    .foregroundColor(.white.opacity(0.35))
-            } else {
-                VStack(spacing: 10) {
-                    ForEach(subtitle.lines) { line in
-                        (Text(line.speaker.isEmpty ? "" : line.speaker + ": ").foregroundColor(Color(red: 1, green: 0.79, blue: 0.3))
-                         + Text(line.text).foregroundColor(.white))
-                            .font(.system(size: subtitle.page ? 26 : 38, weight: .bold))
-                            .multilineTextAlignment(.center)
-                            .minimumScaleFactor(0.4)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .animation(.easeOut(duration: 0.15), value: subtitle.lines)
-            }
-            Spacer(minLength: 8)
-        }
-        .padding()
-    }
-
-    private var statusPill: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 6) {
-                Circle().fill(status.isLive ? Color.green : Color.gray).frame(width: 8, height: 8)
-                Text(status.isLive ? "يقرأ من التلفزيون" : "ما يشوف التلفزيون").font(.caption.bold())
-            }
-            if status.isLive && status.tvCount > 0 {
-                Text("وتطلع على التلفزيون بعد ✓").font(.caption2).foregroundColor(.green)
-            }
-            if !status.lastError.isEmpty {
-                Text(status.lastError).font(.caption2).foregroundColor(.red).lineLimit(2)
-            }
-        }
-        .padding(8)
-        .foregroundColor(.white)
-        .background(Color.white.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
-    }
-
-    private var closeButton: some View {
-        Button { dismiss() } label: {
-            Label("إغلاق", systemImage: "xmark.circle.fill")
-                .padding(10)
-                .background(Color.black.opacity(0.55), in: Capsule())
-        }
-        .foregroundColor(.white)
-    }
-
-    // MARK: aiming screen
 
     /// The 16:9 frame the TV must fill, with the read area (blue) inside it.
     private var guideOverlay: some View {
@@ -363,7 +235,8 @@ struct CameraModeView: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 6) {
                     Circle().fill(status.isLive ? Color.green : Color.gray).frame(width: 10, height: 10)
-                    Text(status.isLive ? "يقرأ ✓" : "وجّه الكاميرا على التلفزيون")
+                    Text(status.isLive ? (status.tvCount > 0 ? "يقرأ ✓ التلفزيون متصل" : "يقرأ… ينتظر التلفزيون")
+                                       : "وجّه الكاميرا على التلفزيون")
                         .bold()
                 }
                 if !status.lastEnglish.isEmpty {
@@ -377,13 +250,17 @@ struct CameraModeView: View {
             .padding(10)
             .background(Color.black.opacity(0.55), in: RoundedRectangle(cornerRadius: 10))
             Spacer()
-            closeButton
+            Button { dismiss() } label: {
+                Label("إغلاق", systemImage: "xmark.circle.fill")
+                    .padding(10)
+                    .background(Color.black.opacity(0.55), in: Capsule())
+            }
         }
         .foregroundColor(.white)
     }
 
     private var bottomBar: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: 6) {
             Text("حط الجوال على ستاند قدام التلفزيون، وقرّب لين شاشة التلفزيون تملأ الإطار الأبيض. المربع الأزرق لازم يكون على مكان الترجمة الإنجليزية.")
                 .font(.footnote)
                 .multilineTextAlignment(.center)
@@ -397,11 +274,6 @@ struct CameraModeView: View {
                 }
                 .frame(maxWidth: 420)
             }
-            Button { withAnimation { aiming = false } } label: {
-                Label("جاهز: اعرض الترجمة", systemImage: "text.bubble.fill").bold()
-                    .frame(maxWidth: 320, minHeight: 36)
-            }
-            .buttonStyle(.borderedProminent)
         }
         .padding(10)
         .foregroundColor(.white)
